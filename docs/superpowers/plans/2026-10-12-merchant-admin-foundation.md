@@ -49,11 +49,12 @@ tests/e2e/               Playwright 关键业务流程
 
 **Files:** `package.json`, `pnpm-lock.yaml`, `index.html`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.prettierrc.json`, `.gitignore`, `src/main.tsx`, `src/app/App.tsx`, `src/app/App.test.tsx`, `src/test/setup.ts`
 
-**Interfaces:** `App` 导出 React 根组件；脚本提供 `dev`, `build`, `typecheck`, `lint`, `test`, `test:e2e`, `check`。
+**Interfaces:** `App` 导出 React 根组件；脚本提供 `dev`, `build`, `typecheck`, `lint`, `format:check`, `test`, `test:e2e`, `check`。
 
 - [ ] 先写 `App.test.tsx`：断言渲染“商户工作台”主标题。
 - [ ] 运行 `pnpm test -- src/app/App.test.tsx`，确认因入口缺失而失败。
 - [ ] 初始化 Vite React TypeScript、Vitest、Testing Library、ESLint、Prettier；设置 Node `>=22.12.0`，固定 pnpm `packageManager` 字段。
+- [ ] `check` 脚本同时运行 Prettier 校验，覆盖设计文档要求的格式检查。
 - [ ] 实现最小 App 和测试环境配置。
 - [ ] 运行 `pnpm test -- src/app/App.test.tsx`、`pnpm typecheck`、`pnpm lint`、`pnpm build`；四项退出码均为 0。
 
