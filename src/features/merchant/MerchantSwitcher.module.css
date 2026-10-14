@@ -11,22 +11,32 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  gap: var(--space-3);
+  gap: var(--space-2);
   justify-content: space-between;
   min-width: 12rem;
-  padding: 0.5rem 0.75rem;
+  min-height: var(--control-height);
+  padding: 0.25rem 0.75rem;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
-.trigger:focus-visible {
-  outline: 3px solid var(--color-focus-ring);
-  outline-offset: 2px;
+.trigger:hover {
+  border-color: var(--color-primary-hover);
+}
+
+.trigger:focus-visible,
+.trigger[data-focus-visible] {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 .popover {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control);
-  box-shadow: 0 0.75rem 1.75rem rgb(16 24 40 / 14%);
+  box-shadow: var(--shadow-popover);
   min-width: var(--trigger-width);
   padding: var(--space-1);
 }
@@ -36,13 +46,18 @@
 }
 
 .option {
-  border-radius: 0.375rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  padding: 0.625rem 0.75rem;
+  padding: 0.375rem 0.75rem;
 }
 
 .option[data-focused],
+.option[data-hovered] {
+  background: var(--color-surface-muted);
+}
+
 .option[data-selected] {
-  background: #eff4ff;
-  color: #1849a9;
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  font-weight: 600;
 }

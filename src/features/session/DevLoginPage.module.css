@@ -10,16 +10,16 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  box-shadow: 0 1.25rem 3rem rgb(16 24 40 / 8%);
+  box-shadow: var(--shadow-card);
   max-width: 32rem;
   padding: var(--space-8);
   width: 100%;
 }
 
 .badge {
-  background: #fffaeb;
+  background: var(--color-warning-surface);
   border-radius: 999px;
-  color: #93370d;
+  color: var(--color-warning-text);
   display: inline-flex;
   font-size: 0.75rem;
   font-weight: 700;

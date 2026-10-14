@@ -4,17 +4,17 @@
 }
 
 .sidebar {
-  background: #101828;
-  color: #eaecf0;
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-text);
   display: flex;
   flex: 0 0 15rem;
   flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-6) var(--space-4);
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-3);
 }
 
 .brand {
-  color: white;
+  color: var(--color-on-primary);
   font-size: 1.125rem;
   font-weight: 700;
   text-decoration: none;
@@ -22,24 +22,31 @@
 
 .sidebar nav {
   display: grid;
-  gap: var(--space-1);
+  gap: 0.125rem;
 }
 
 .navItem {
-  border-radius: var(--radius-control);
-  color: #d0d5dd;
-  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-sidebar-text-muted);
+  padding: 0.5rem 0.75rem;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
   text-decoration: none;
 }
 
-.navItem:hover,
+.navItem:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-on-primary);
+}
+
 .navItem[aria-current="page"] {
-  background: #344054;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .environment {
-  color: #98a2b3;
+  color: var(--color-sidebar-meta);
   font-size: 0.75rem;
   margin-top: auto;
 }
@@ -57,8 +64,8 @@
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
-  min-height: 4rem;
-  padding: 0 var(--space-8);
+  min-height: 3.5rem;
+  padding: 0 var(--space-6);
 }
 
 .accountArea {
@@ -70,13 +77,14 @@
 .content {
   margin: 0 auto;
   max-width: 90rem;
-  padding: var(--space-8);
+  padding: var(--space-6);
   width: 100%;
 }
 
 .content h1 {
-  font-size: 1.5rem;
-  margin: 0 0 var(--space-6);
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-4);
 }
 
 .welcome {
@@ -85,6 +93,12 @@
   border-radius: var(--radius-card);
   color: var(--color-text-muted);
   padding: var(--space-6);
+}
+
+.navItem:focus-visible,
+.brand:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 @media (max-width: 48rem) {
