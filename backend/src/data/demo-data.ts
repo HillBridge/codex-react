@@ -38,3 +38,10 @@ export const demoUsers: DemoUser[] = [
     },
   },
 ];
+
+export interface DemoOrder { id: string; merchantId: string; number: string; createdAt: string; amount: number; status: "pending" | "confirmed" | "cancelled"; version: number }
+export const initialOrders: DemoOrder[] = [
+  { id: "order-1001", merchantId: "merchant-east", number: "OD202610120001", createdAt: "2026-10-12T08:30:00.000Z", amount: 12800, status: "pending", version: 1 },
+  { id: "order-1002", merchantId: "merchant-east", number: "OD202610120002", createdAt: "2026-10-12T09:15:00.000Z", amount: 5680, status: "confirmed", version: 1 },
+  { id: "order-2001", merchantId: "merchant-west", number: "OD202610120101", createdAt: "2026-10-12T10:05:00.000Z", amount: 9200, status: "pending", version: 1 },
+];

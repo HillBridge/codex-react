@@ -5,6 +5,7 @@ import serve from "koa-static";
 import { ApiHttpError, sendApiError } from "./lib/errors";
 import { requestId } from "./lib/request-id";
 import { authRouter } from "./routes/auth";
+import { orderRouter } from "./routes/orders";
 
 interface CreateAppOptions {
   serveStatic?: boolean;
@@ -32,6 +33,8 @@ export function createApp(options: CreateAppOptions = {}) {
   app.use(bodyParser());
   app.use(authRouter.routes());
   app.use(authRouter.allowedMethods());
+  app.use(orderRouter.routes());
+  app.use(orderRouter.allowedMethods());
 
   app.use(async (ctx, next) => {
     if (!ctx.path.startsWith("/api/")) {
