@@ -131,6 +131,12 @@ describe("order routes", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({ page: 1, pageSize: 100 });
+
+    const minimumPageSize = await request(
+      "/api/merchants/merchant-east/orders?pageSize=0",
+      { headers: { cookie: admin } },
+    );
+    await expect(minimumPageSize.json()).resolves.toMatchObject({ pageSize: 1 });
   });
 
   it("rejects order updates from a read-only user", async () => {

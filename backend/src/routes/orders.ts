@@ -5,9 +5,14 @@ import { ApiHttpError } from "../lib/errors";
 
 export const orderRouter = new Router({ prefix: "/api/merchants/:merchantId" });
 
-function positiveInteger(value: unknown, fallback: number) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : fallback;
+function boundedInteger(
+  value: unknown,
+  fallback: number,
+  maximum = Number.MAX_SAFE_INTEGER,
+) {
+  const parsed = typeof value === "string" && value.trim() ? Number(value) : NaN;
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(maximum, Math.max(1, Math.floor(parsed)));
 }
 
 orderRouter.get("/orders", (ctx) => {
@@ -23,8 +28,8 @@ orderRouter.get("/orders", (ctx) => {
   const query = String(ctx.query.q ?? "")
     .trim()
     .toLowerCase();
-  const page = positiveInteger(ctx.query.page, 1);
-  const pageSize = Math.min(100, positiveInteger(ctx.query.pageSize, 20));
+  const page = boundedInteger(ctx.query.page, 1);
+  const pageSize = boundedInteger(ctx.query.pageSize, 20, 100);
   const filtered = listOrders(user.merchant.id).filter(
     (order) =>
       (status === "all" || status === order.status) &&
