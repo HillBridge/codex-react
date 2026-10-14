@@ -15,7 +15,7 @@ function sessionIdFrom(ctx: Context) {
     ?.slice(prefix.length);
 }
 
-function cookieOptions() {
+export function sessionCookieOptions() {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
@@ -28,7 +28,7 @@ function cookieOptions() {
 export function createSession(ctx: Context, user: DemoUser) {
   const id = randomUUID();
   saveSession(id, user);
-  ctx.cookies.set(sessionCookieName, id, cookieOptions());
+  ctx.cookies.set(sessionCookieName, id, sessionCookieOptions());
 }
 
 export function currentSession(ctx: Context) {
@@ -38,5 +38,5 @@ export function currentSession(ctx: Context) {
 export function clearSession(ctx: Context) {
   const id = sessionIdFrom(ctx);
   deleteSession(id);
-  ctx.cookies.set(sessionCookieName, null, cookieOptions());
+  ctx.cookies.set(sessionCookieName, null, sessionCookieOptions());
 }

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("global styles load on standalone login", async ({ page }) => {
-  await page.goto("/dev-login");
+  await page.goto("/login");
 
   await expect
     .poll(() =>
@@ -19,8 +19,11 @@ test("global styles load on standalone login", async ({ page }) => {
 
 test("merchant admin can search, open, and update an order", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "以管理员身份进入演示" }).click();
+  await page.getByRole("textbox", { name: "用户名" }).fill("admin");
+  await page.getByLabel("密码").fill("admin123");
+  await page.getByRole("button", { name: "登录" }).click();
   await expect(page.getByRole("heading", { name: "东区旗舰店" })).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveCount(0);
   await page.getByRole("link", { name: "订单管理" }).click();
   await expect(page.getByRole("grid", { name: "订单列表" })).toBeVisible();
   await page.getByRole("textbox", { name: /搜索订单/ }).fill("1001");
@@ -36,8 +39,10 @@ test("merchant admin can search, open, and update an order", async ({ page }) =>
 });
 
 test("read-only role cannot see order mutation controls", async ({ page }) => {
-  await page.goto("/dev-login");
-  await page.getByRole("button", { name: "以只读身份进入演示" }).click();
+  await page.goto("/login");
+  await page.getByRole("textbox", { name: "用户名" }).fill("viewer");
+  await page.getByLabel("密码").fill("viewer123");
+  await page.getByRole("button", { name: "登录" }).click();
   await page.getByRole("link", { name: "订单管理" }).click();
   await page.getByRole("link", { name: "查看详情" }).first().click();
   await expect(page.getByRole("button", { name: "确认订单" })).toHaveCount(0);

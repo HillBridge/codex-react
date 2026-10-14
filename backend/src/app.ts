@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { createReadStream } from "node:fs";
 import bodyParser from "koa-bodyparser";
 import Koa, { type Context, type Next } from "koa";
 import serve from "koa-static";
@@ -31,6 +32,13 @@ export function createApp(options: CreateAppOptions = {}) {
   app.use(errorHandler);
   app.use(requestId);
   app.use(bodyParser());
+  app.use(async (ctx, next) => {
+    if (ctx.method === "GET" && ctx.path === "/health") {
+      ctx.body = { status: "ok" };
+      return;
+    }
+    await next();
+  });
   app.use(authRouter.routes());
   app.use(authRouter.allowedMethods());
   app.use(orderRouter.routes());
@@ -47,6 +55,13 @@ export function createApp(options: CreateAppOptions = {}) {
 
   if (options.serveStatic) {
     app.use(serve(resolve(process.cwd(), "dist")));
+    app.use(async (ctx, next) => {
+      await next();
+      if (ctx.method === "GET" && !ctx.path.startsWith("/api/")) {
+        ctx.type = "html";
+        ctx.body = createReadStream(resolve(process.cwd(), "dist/index.html"));
+      }
+    });
   }
 
   return app;

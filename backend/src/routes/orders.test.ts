@@ -11,12 +11,14 @@ const servers: ReturnType<typeof createServer>[] = [];
 beforeEach(() => resetDemoStore());
 afterEach(async () => {
   await Promise.all(
-    servers.splice(0).map(
-      (server) =>
-        new Promise<void>((resolve, reject) =>
-          server.close((error) => (error ? reject(error) : resolve())),
-        ),
-    ),
+    servers
+      .splice(0)
+      .map(
+        (server) =>
+          new Promise<void>((resolve, reject) =>
+            server.close((error) => (error ? reject(error) : resolve())),
+          ),
+      ),
   );
 });
 
@@ -70,26 +72,81 @@ describe("order routes", () => {
   it("requires a session and prevents access to another merchant", async () => {
     expect((await request("/api/merchants/merchant-east/orders")).status).toBe(401);
     const cookie = await login("admin", "admin123");
-    expect((await request("/api/merchants/merchant-west/orders", { headers: { cookie } })).status).toBe(403);
+    expect(
+      (await request("/api/merchants/merchant-west/orders", { headers: { cookie } }))
+        .status,
+    ).toBe(403);
+    expect(
+      (
+        await request("/api/merchants/merchant-east/orders/missing", {
+          headers: { cookie },
+        })
+      ).status,
+    ).toBe(404);
   });
 
   it("filters a merchant order list and enforces updates with versioning", async () => {
     const admin = await login("admin", "admin123");
-    const list = await request("/api/merchants/merchant-east/orders?status=pending&q=120001&page=1&pageSize=1", { headers: { cookie: admin } });
+    const list = await request(
+      "/api/merchants/merchant-east/orders?status=pending&q=120001&page=1&pageSize=1",
+      { headers: { cookie: admin } },
+    );
     expect(list.status).toBe(200);
-    await expect(list.json()).resolves.toMatchObject({ total: 1, items: [{ id: "order-1001", status: "pending" }] });
+    await expect(list.json()).resolves.toMatchObject({
+      total: 1,
+      items: [{ id: "order-1001", status: "pending" }],
+    });
 
-    const conflict = await request("/api/merchants/merchant-east/orders/order-1001/status", { method: "PATCH", headers: { cookie: admin, "content-type": "application/json" }, body: JSON.stringify({ status: "confirmed", expectedVersion: 2 }) });
+    const conflict = await request(
+      "/api/merchants/merchant-east/orders/order-1001/status",
+      {
+        method: "PATCH",
+        headers: { cookie: admin, "content-type": "application/json" },
+        body: JSON.stringify({ status: "confirmed", expectedVersion: 2 }),
+      },
+    );
     expect(conflict.status).toBe(409);
 
-    const updated = await request("/api/merchants/merchant-east/orders/order-1001/status", { method: "PATCH", headers: { cookie: admin, "content-type": "application/json" }, body: JSON.stringify({ status: "confirmed", expectedVersion: 1 }) });
+    const updated = await request(
+      "/api/merchants/merchant-east/orders/order-1001/status",
+      {
+        method: "PATCH",
+        headers: { cookie: admin, "content-type": "application/json" },
+        body: JSON.stringify({ status: "confirmed", expectedVersion: 1 }),
+      },
+    );
     expect(updated.status).toBe(200);
-    await expect(updated.json()).resolves.toMatchObject({ status: "confirmed", version: 2 });
+    await expect(updated.json()).resolves.toMatchObject({
+      status: "confirmed",
+      version: 2,
+    });
+  });
+
+  it("normalizes unsupported filters and out-of-range pagination", async () => {
+    const admin = await login("admin", "admin123");
+    const response = await request(
+      "/api/merchants/merchant-east/orders?status=unknown&page=-3&pageSize=1000",
+      { headers: { cookie: admin } },
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ page: 1, pageSize: 100 });
   });
 
   it("rejects order updates from a read-only user", async () => {
     const viewer = await login("viewer", "viewer123");
-    const response = await request("/api/merchants/merchant-west/orders/order-2001/status", { method: "PATCH", headers: { cookie: viewer, "content-type": "application/json" }, body: JSON.stringify({ status: "confirmed", expectedVersion: 1 }) });
+    const response = await request(
+      "/api/merchants/merchant-west/orders/order-2001/status",
+      {
+        method: "PATCH",
+        headers: { cookie: viewer, "content-type": "application/json" },
+        body: JSON.stringify({ status: "confirmed", expectedVersion: 1 }),
+      },
+    );
     expect(response.status).toBe(403);
+    const order = await request("/api/merchants/merchant-west/orders/order-2001", {
+      headers: { cookie: viewer },
+    });
+    await expect(order.json()).resolves.toMatchObject({ status: "pending", version: 1 });
   });
 });
