@@ -43,6 +43,7 @@ export function OrderFilters() {
       </TextField>
       <Select
         aria-label="订单状态"
+        className={styles.selectField}
         selectedKey={filters.status}
         onSelectionChange={(key) => update("status", String(key))}
       >
@@ -50,12 +51,20 @@ export function OrderFilters() {
         <Button className={styles.select}>
           <SelectValue />
         </Button>
-        <Popover>
-          <ListBox>
-            <ListBoxItem id="all">全部状态</ListBoxItem>
-            <ListBoxItem id="pending">待处理</ListBoxItem>
-            <ListBoxItem id="confirmed">已确认</ListBoxItem>
-            <ListBoxItem id="cancelled">已取消</ListBoxItem>
+        <Popover className={styles.popover}>
+          <ListBox className={styles.list}>
+            <ListBoxItem className={styles.option} id="all">
+              全部状态
+            </ListBoxItem>
+            <ListBoxItem className={styles.option} id="pending">
+              待处理
+            </ListBoxItem>
+            <ListBoxItem className={styles.option} id="confirmed">
+              已确认
+            </ListBoxItem>
+            <ListBoxItem className={styles.option} id="cancelled">
+              已取消
+            </ListBoxItem>
           </ListBox>
         </Popover>
       </Select>
