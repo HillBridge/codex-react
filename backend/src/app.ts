@@ -4,6 +4,7 @@ import Koa, { type Context, type Next } from "koa";
 import serve from "koa-static";
 import { ApiHttpError, sendApiError } from "./lib/errors";
 import { requestId } from "./lib/request-id";
+import { authRouter } from "./routes/auth";
 
 interface CreateAppOptions {
   serveStatic?: boolean;
@@ -29,6 +30,8 @@ export function createApp(options: CreateAppOptions = {}) {
   app.use(errorHandler);
   app.use(requestId);
   app.use(bodyParser());
+  app.use(authRouter.routes());
+  app.use(authRouter.allowedMethods());
 
   app.use(async (ctx, next) => {
     if (!ctx.path.startsWith("/api/")) {
