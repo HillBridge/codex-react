@@ -4,11 +4,6 @@ export interface Merchant {
   permissions: string[];
 }
 
-export interface MerchantListResponse {
-  items: Merchant[];
-}
-
 export interface MerchantRouteContext {
   merchant: Merchant;
-  merchants: Merchant[];
 }

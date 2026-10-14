@@ -9,7 +9,7 @@ describe("App", () => {
   it("renders the merchant workspace heading", () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const router = createMemoryRouter(createAppRoutes(), {
-      initialEntries: ["/dev-login"],
+      initialEntries: ["/login"],
     });
     render(
       <QueryClientProvider client={client}>
@@ -17,6 +17,6 @@ describe("App", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByRole("heading", { name: "开发环境演示登录" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "登录" })).toBeDefined();
   });
 });

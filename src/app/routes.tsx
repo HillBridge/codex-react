@@ -10,7 +10,6 @@ import {
 } from "react-router";
 import { LoginPage } from "../pages/LoginPage";
 import { MerchantHomePage } from "../pages/MerchantHomePage";
-import { useMerchants } from "../features/merchant";
 import { useSession } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
 import { StatusPanel } from "../shared/ui/status-panel";
@@ -22,29 +21,18 @@ function isUnauthorized(error: unknown) {
 
 function RootRedirect() {
   const session = useSession();
-  const merchants = useMerchants();
-
-  if (session.isPending || (session.isSuccess && merchants.isPending)) {
+  if (session.isPending) {
     return <StatusPanel kind="loading" title="正在加载工作区" />;
   }
 
   if (session.isError) {
-    if (isUnauthorized(session.error) && import.meta.env.DEV) {
-      return <Navigate replace to="/dev-login" />;
+    if (isUnauthorized(session.error)) {
+      return <Navigate replace to="/login" />;
     }
     return <StatusPanel kind="error" title="无法读取登录状态" />;
   }
 
-  if (merchants.isError) {
-    return <StatusPanel kind="error" title="无法读取商户列表" />;
-  }
-
-  const firstMerchant = merchants.data?.items[0];
-  return firstMerchant ? (
-    <Navigate replace to={`/m/${firstMerchant.id}`} />
-  ) : (
-    <StatusPanel kind="forbidden" title="当前账号没有可访问的商户" />
-  );
+  return <Navigate replace to={`/m/${session.data.merchant.id}`} />;
 }
 
 function RequireSession() {
@@ -60,7 +48,7 @@ function RequireSession() {
   useEffect(() => {
     const expireSession = () => {
       queryClient.clear();
-      navigate(import.meta.env.DEV ? "/dev-login" : "/", { replace: true });
+      navigate("/login", { replace: true });
     };
     window.addEventListener("app:session-expired", expireSession);
     return () => window.removeEventListener("app:session-expired", expireSession);
@@ -69,8 +57,8 @@ function RequireSession() {
   if (session.isPending) {
     return <StatusPanel kind="loading" title="正在验证登录状态" />;
   }
-  if (unauthorized && import.meta.env.DEV) {
-    return <Navigate replace to="/dev-login" />;
+  if (unauthorized) {
+    return <Navigate replace to="/login" />;
   }
   if (session.isError) {
     return <StatusPanel kind="error" title="登录状态无效" />;
@@ -79,31 +67,20 @@ function RequireSession() {
 }
 
 function MerchantRoute() {
-  const queryClient = useQueryClient();
   const { merchantId } = useParams();
-  const merchants = useMerchants();
-  const unauthorized = merchants.isError && isUnauthorized(merchants.error);
-
-  useEffect(() => {
-    if (unauthorized) queryClient.clear();
-  }, [queryClient, unauthorized]);
-
-  if (merchants.isPending) {
+  const session = useSession();
+  if (session.isPending) {
     return <StatusPanel kind="loading" title="正在加载商户" />;
   }
-  if (unauthorized && import.meta.env.DEV) {
-    return <Navigate replace to="/dev-login" />;
+  if (session.isError) {
+    return <Navigate replace to="/login" />;
   }
-  if (merchants.isError) {
-    return <StatusPanel kind="error" title="无法读取商户列表" />;
-  }
-
-  const merchant = merchants.data.items.find((item) => item.id === merchantId);
-  if (!merchant) {
+  const merchant = session.data.merchant;
+  if (merchant.id !== merchantId) {
     return <StatusPanel kind="forbidden" title="无权访问该商户" />;
   }
 
-  return <Outlet context={{ merchant, merchants: merchants.data.items }} />;
+  return <Outlet context={{ merchant }} />;
 }
 
 export function createAppRoutes(): RouteObject[] {
@@ -147,9 +124,7 @@ export function createAppRoutes(): RouteObject[] {
     { path: "*", Component: NotFoundPage },
   ];
 
-  if (import.meta.env.DEV) {
-    routes.unshift({ path: "/dev-login", Component: LoginPage });
-  }
+  routes.unshift({ path: "/login", Component: LoginPage });
 
   return routes;
 }

@@ -1,10 +1,12 @@
 import { Link, Outlet, useOutletContext } from "react-router";
-import { MerchantSwitcher, type MerchantRouteContext } from "../features/merchant";
+import type { MerchantRouteContext } from "../features/merchant";
+import { useSession } from "../features/session";
 import { StatusPanel } from "../shared/ui/status-panel";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
-  const { merchant, merchants } = useOutletContext<MerchantRouteContext>();
+  const { merchant } = useOutletContext<MerchantRouteContext>();
+  const session = useSession();
 
   return (
     <div className={styles.shell}>
@@ -26,15 +28,12 @@ export function AppLayout() {
         <header className={styles.topbar}>
           <span>商户管理控制台</span>
           <div className={styles.accountArea}>
-            <MerchantSwitcher merchant={merchant} merchants={merchants} />
-            <span>
-              {merchant.permissions.includes("order:update") ? "管理员账号" : "只读账号"}
-            </span>
+            <span>{session.data?.user.name}</span>
           </div>
         </header>
         <main className={styles.content}>
           <h1>{merchant.name}</h1>
-          <Outlet context={{ merchant, merchants }} />
+          <Outlet context={{ merchant }} />
         </main>
       </div>
     </div>
