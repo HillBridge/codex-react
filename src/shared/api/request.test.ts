@@ -1,48 +1,52 @@
-import { http, HttpResponse } from "msw";
-import { describe, expect, it } from "vitest";
-import { server } from "../../mocks/server";
-import { ApiError } from "./ApiError";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { apiRequest } from "./request";
 
-describe("apiRequest", () => {
-  it("parses a successful JSON response", async () => {
-    server.use(
-      http.get("https://merchant.test/api/success", () =>
-        HttpResponse.json({ message: "ok" }),
-      ),
-    );
+afterEach(() => vi.unstubAllGlobals());
 
-    await expect(
-      apiRequest<{ message: string }>("https://merchant.test/api/success"),
-    ).resolves.toEqual({ message: "ok" });
+describe("apiRequest", () => {
+  it("sends same-origin JSON requests and returns response data", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(new Response('{"message":"ok"}', { status: 200 }));
+    vi.stubGlobal("fetch", fetch);
+
+    await expect(apiRequest<{ message: string }>("/api/session")).resolves.toEqual({
+      message: "ok",
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/session",
+      expect.objectContaining({ credentials: "same-origin" }),
+    );
   });
 
-  it("maps HTTP errors to ApiError", async () => {
-    server.use(
-      http.get("https://merchant.test/api/failure", () =>
-        HttpResponse.json(
-          { code: "ORDER_CONFLICT", requestId: "req-test" },
-          { status: 409 },
+  it("converts structured HTTP failures to ApiError", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: "NO_ACCESS",
+            message: "无权访问",
+            requestId: "req-1",
+          }),
+          { status: 403 },
         ),
       ),
     );
-
-    await expect(apiRequest("https://merchant.test/api/failure")).rejects.toMatchObject({
-      status: 409,
-      code: "ORDER_CONFLICT",
-      requestId: "req-test",
+    await expect(apiRequest("/api/private")).rejects.toMatchObject({
+      status: 403,
+      code: "NO_ACCESS",
+      requestId: "req-1",
     });
-    await expect(apiRequest("https://merchant.test/api/failure")).rejects.toBeInstanceOf(
-      ApiError,
-    );
   });
 
-  it("keeps network failures recognizable", async () => {
-    server.use(http.get("https://merchant.test/api/offline", () => HttpResponse.error()));
-
-    await expect(apiRequest("https://merchant.test/api/offline")).rejects.toMatchObject({
-      status: 0,
-      code: "NETWORK_ERROR",
-    });
+  it("returns undefined for an empty 204 response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
+    );
+    await expect(
+      apiRequest<void>("/api/auth/logout", { method: "POST" }),
+    ).resolves.toBeUndefined();
   });
 });

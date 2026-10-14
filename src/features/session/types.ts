@@ -3,4 +3,5 @@ export interface Session {
     id: string;
     name: string;
   };
+  merchant: { id: string; name: string; permissions: ("order:read" | "order:update")[] };
 }

@@ -1,1 +1,1 @@
-export { DevLoginPage as LoginPage } from "../features/session";
+export { LoginPage } from "../features/session";

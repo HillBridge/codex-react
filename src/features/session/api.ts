@@ -5,10 +5,10 @@ export function getSession() {
   return apiRequest<Session>("/api/session");
 }
 
-export function startDevSession(userId: string) {
-  return apiRequest<Session>("/api/dev-login", {
+export function login(credentials: { username: string; password: string }) {
+  return apiRequest<Session>("/api/auth/login", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify(credentials),
   });
 }

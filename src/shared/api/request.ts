@@ -8,10 +8,17 @@ interface ErrorPayload {
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   let response: Response;
+  const headers = new Headers(init.headers);
+  headers.set("accept", "application/json");
+  headers.set("x-request-id", headers.get("x-request-id") ?? crypto.randomUUID());
+  if (init.body && !headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
 
   try {
     response = await fetch(path, {
       ...init,
+      headers,
       credentials: init.credentials ?? "same-origin",
     });
   } catch (error) {
