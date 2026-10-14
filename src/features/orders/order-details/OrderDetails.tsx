@@ -1,9 +1,9 @@
-import { Button } from "../../shared/ui/Button";
-import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { ApiError } from "../../shared/api/ApiError";
-import { useUpdateOrderStatus } from "./mutations";
-import type { Order } from "./types";
-import styles from "./Orders.module.css";
+import { Button } from "../../../shared/ui/button";
+import { StatusPanel } from "../../../shared/ui/status-panel";
+import { ApiError } from "../../../shared/api/ApiError";
+import { useUpdateOrderStatus } from "../mutations";
+import type { Order } from "../types";
+import styles from "./OrderDetails.module.css";
 
 export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: boolean }) {
   const mutation = useUpdateOrderStatus();

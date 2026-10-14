@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "react-aria-components";
 import { useNavigate } from "react-router";
-import type { Merchant } from "./types";
+import type { Merchant } from "../types";
 import styles from "./MerchantSwitcher.module.css";
 
 interface MerchantSwitcherProps {

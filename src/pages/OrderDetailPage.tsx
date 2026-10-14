@@ -1,7 +1,7 @@
 import { Link, useOutletContext, useParams } from "react-router";
 import type { MerchantRouteContext } from "../features/merchant";
 import { OrderDetails, useOrder } from "../features/orders";
-import { StatusPanel } from "../shared/ui/StatusPanel";
+import { StatusPanel } from "../shared/ui/status-panel";
 
 export function OrderDetailPage() {
   const { merchant } = useOutletContext<MerchantRouteContext>();

@@ -1,7 +1,7 @@
 import { Cell, Column, Row, Table, TableBody, TableHeader } from "react-aria-components";
 import { Link } from "react-router";
-import type { Order, OrderStatus } from "./types";
-import styles from "./Orders.module.css";
+import type { Order, OrderStatus } from "../types";
+import styles from "./OrderTable.module.css";
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: "待处理",

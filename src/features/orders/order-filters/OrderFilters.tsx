@@ -11,8 +11,8 @@ import {
   Label,
 } from "react-aria-components";
 import { useSearchParams } from "react-router";
-import { parseOrderFilters } from "./types";
-import styles from "./Orders.module.css";
+import { parseOrderFilters } from "../types";
+import styles from "./OrderFilters.module.css";
 
 export function OrderFilters() {
   const [params, setParams] = useSearchParams();

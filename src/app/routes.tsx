@@ -13,7 +13,7 @@ import { MerchantHomePage } from "../pages/MerchantHomePage";
 import { useMerchants } from "../features/merchant";
 import { useSession } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
-import { StatusPanel } from "../shared/ui/StatusPanel";
+import { StatusPanel } from "../shared/ui/status-panel";
 import { AppLayout, NotFoundPage, RouteErrorPage } from "./AppLayout";
 
 function isUnauthorized(error: unknown) {

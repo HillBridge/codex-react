@@ -7,9 +7,9 @@ import {
   useOrders,
   parseOrderFilters,
 } from "../features/orders";
-import { StatusPanel } from "../shared/ui/StatusPanel";
-import { Button } from "../shared/ui/Button";
-import styles from "../features/orders/Orders.module.css";
+import { StatusPanel } from "../shared/ui/status-panel";
+import { Button } from "../shared/ui/button";
+import styles from "./OrdersPage.module.css";
 
 export function OrdersPage() {
   const { merchant } = useOutletContext<MerchantRouteContext>();

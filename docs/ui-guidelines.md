@@ -5,16 +5,19 @@
 ## 样式和组件放置
 
 ```text
-src/shared/ui       跨业务复用、契约稳定的基础组件
-src/features/<域>   业务组件与业务局部组合
-src/pages           路由级页面组合
-src/shared/ui/tokens.css  全局设计变量
-src/app/styles/global.css 全局 reset、字体和页面默认样式
+src/shared/ui/<component>/       跨业务复用、契约稳定的基础组件
+src/features/<domain>/<component>/  业务域内可独立维护的组件
+src/features/<domain>/            API、query、mutation、types、领域测试
+src/pages                         路由级页面组合和页面专属样式
+src/shared/ui/tokens.css          全局设计变量
+src/app/styles/global.css         全局 reset、字体和页面默认样式
 ```
 
 依赖从基础到页面：tokens / global styles → shared UI → feature UI → pages。页面可以组合下层组件；shared UI 不依赖 feature 或 page。
 
 - 只有在多个 feature 确有相同视觉和行为契约时，才把组件提升到 `shared/ui`。不要为了封装而封装每一个 React Aria 原语。
+- 每个独立维护的 UI 组件使用一个 kebab-case 目录；目录内放 PascalCase 的组件文件、对应 CSS Module、组件级测试和 `index.ts` 导出。不要把许多组件的 TSX/CSS/test 平铺在同一目录。
+- Feature 的根目录保留业务 API、query/mutation、类型、query key 和 feature 级集成测试；组件则归入各自目录。Feature 根 `index.ts` 负责稳定导出业务组件。
 - 共享组件通过少量语义化 props 提供变体和尺寸；调用方不要依赖内部 DOM 结构或内部 CSS Module 类名。
 - 跨页面重复的结构（如筛选工具栏、页面标题区、数据表格）可先在 feature 内验证，再在契约稳定后提升复用。
 - 页面负责组合业务和共享 UI，不定义全局样式或重复实现基础控件。

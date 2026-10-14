@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { Button } from "../../shared/ui/Button";
-import { StatusPanel } from "../../shared/ui/StatusPanel";
-import { sessionQueryKey } from "./queries";
-import { startDevSession } from "./api";
+import { Button } from "../../../shared/ui/button";
+import { StatusPanel } from "../../../shared/ui/status-panel";
+import { sessionQueryKey } from "../queries";
+import { startDevSession } from "../api";
 import styles from "./DevLoginPage.module.css";
 
 export function DevLoginPage() {
