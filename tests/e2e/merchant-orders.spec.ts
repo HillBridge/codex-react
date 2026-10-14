@@ -1,5 +1,22 @@
 import { expect, test } from "@playwright/test";
 
+test("global styles load on standalone login", async ({ page }) => {
+  await page.goto("/dev-login");
+
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-primary")
+          .trim(),
+      ),
+    )
+    .toBe("#1677ff");
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.body).minWidth))
+    .toBe("280px");
+});
+
 test("merchant admin can search, open, and update an order", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "以管理员身份进入演示" }).click();

@@ -1,48 +1,35 @@
 :root {
-  color-scheme: light;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "PingFang SC",
-    "Microsoft YaHei",
-    sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-
-  --color-primary: #155eef;
-  --color-primary-hover: #004eeb;
-  --color-focus-ring: #84adff;
-  --color-danger: #b42318;
-  --color-text: #101828;
-  --color-text-muted: #667085;
-  --color-border: #d0d5dd;
+  --color-primary: #1677ff;
+  --color-primary-hover: #4096ff;
+  --color-primary-active: #0958d9;
+  --color-primary-subtle: #e6f4ff;
+  --color-focus-ring: #91caff;
+  --color-danger: #ff4d4f;
+  --color-danger-hover: #ff7875;
+  --color-text: #1f1f1f;
+  --color-text-muted: #595959;
+  --color-text-subtle: #8c8c8c;
+  --color-border: #d9d9d9;
+  --color-border-strong: #bfbfbf;
   --color-surface: #ffffff;
-  --color-surface-muted: #f2f4f7;
-  --color-page: #f4f6f8;
-  --radius-control: 0.5rem;
-  --radius-card: 0.875rem;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.875rem;
+  --color-surface-muted: #fafafa;
+  --color-page: #f5f5f5;
+  --color-sidebar: #001529;
+  --color-sidebar-hover: #102a43;
+  --radius-control: 0.375rem;
+  --radius-card: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --shadow-popover: 0 6px 16px rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%);
+  --control-height-sm: 2rem;
+  --control-height: 2rem;
+  --control-height-lg: 2.5rem;
   --color-muted: var(--color-text-muted);
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
-
-  background: var(--color-page);
-  color: var(--color-text);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-width: 20rem;
-  min-height: 100vh;
 }

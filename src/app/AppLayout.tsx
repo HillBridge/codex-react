@@ -1,7 +1,6 @@
 import { Link, Outlet, useOutletContext } from "react-router";
 import { MerchantSwitcher, type MerchantRouteContext } from "../features/merchant";
 import { StatusPanel } from "../shared/ui/StatusPanel";
-import "../shared/ui/tokens.css";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {

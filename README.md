@@ -34,6 +34,10 @@ Playwright 首次使用需要安装 Chromium：`pnpm exec playwright install chr
 - `src/mocks`: 仅用于开发/测试的 MSW handlers 和 fixtures。
 - `tests/e2e`: 登录、订单筛选、详情和状态变更浏览器流程。
 
+## UI 开发
+
+全局设计变量与页面基础样式在应用入口统一加载。新增共享控件、业务样式或设计变量前，请先阅读 [UI 开发约定](docs/ui-guidelines.md)。
+
 服务端数据由 TanStack Query 管理，查询键包含商户和筛选条件；不把远端数据放入全局客户端 store，也不持久化到 localStorage。商户 ID 是路由和查询参数，不是安全边界：每个真实 API 都必须由后端依据会话校验用户、商户、资源归属和权限。前端切换商户时依靠路由与 query key 避免展示旧缓存，但这不能替代服务端授权。
 
 ## 接入真实后端前
