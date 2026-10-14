@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll } from "vitest";
 import { resetMockState } from "../mocks/handlers";
 import { server } from "../mocks/server";
 
-beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "bypass" }));
 afterEach(() => {
   server.resetHandlers();
   resetMockState();
