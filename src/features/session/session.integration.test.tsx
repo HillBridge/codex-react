@@ -27,7 +27,7 @@ function renderAt(path: string) {
 }
 
 describe("session scoped routing", () => {
-  it("redirects a restored session directly to its merchant workspace", async () => {
+  it("redirects a restored session directly to the fixed workspace route", async () => {
     vi.stubGlobal(
       "fetch",
       vi
@@ -39,12 +39,12 @@ describe("session scoped routing", () => {
     expect(
       await screen.findByRole("heading", { name: "东区旗舰店" }),
     ).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/m/merchant-east");
+    expect(router.state.location.pathname).toBe("/workspace");
     expect(screen.getByText("运营管理员")).toBeInTheDocument();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
-  it("rejects a route for a merchant outside the restored session", async () => {
+  it("does not expose the removed merchant-scoped route", async () => {
     vi.stubGlobal(
       "fetch",
       vi
@@ -54,7 +54,7 @@ describe("session scoped routing", () => {
     renderAt("/m/merchant-west");
 
     expect(
-      await screen.findByRole("heading", { name: "无权访问该商户" }),
+      await screen.findByRole("heading", { name: "页面不存在" }),
     ).toBeInTheDocument();
   });
 });

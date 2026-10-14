@@ -1,6 +1,5 @@
 import { useSearchParams } from "react-router";
-import { useOutletContext } from "react-router";
-import type { MerchantRouteContext } from "../features/merchant";
+import { useSession } from "../features/session";
 import {
   OrderFilters,
   OrderTable,
@@ -12,7 +11,7 @@ import { Button } from "../shared/ui/button";
 import styles from "./OrdersPage.module.css";
 
 export function OrdersPage() {
-  const { merchant } = useOutletContext<MerchantRouteContext>();
+  const merchant = useSession().data!.merchant;
   const [params, setParams] = useSearchParams();
   const filters = parseOrderFilters(params);
   const query = useOrders(merchant.id, filters);

@@ -6,10 +6,9 @@ import {
   Outlet,
   type RouteObject,
   useNavigate,
-  useParams,
 } from "react-router";
 import { LoginPage } from "../pages/LoginPage";
-import { MerchantHomePage } from "../pages/MerchantHomePage";
+import { WorkspaceHomePage } from "../pages/WorkspaceHomePage";
 import { useSession } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
 import { StatusPanel } from "../shared/ui/status-panel";
@@ -32,7 +31,7 @@ function RootRedirect() {
     return <StatusPanel kind="error" title="无法读取登录状态" />;
   }
 
-  return <Navigate replace to={`/m/${session.data.merchant.id}`} />;
+  return <Navigate replace to="/workspace" />;
 }
 
 function RequireSession() {
@@ -66,23 +65,6 @@ function RequireSession() {
   return <Outlet />;
 }
 
-function MerchantRoute() {
-  const { merchantId } = useParams();
-  const session = useSession();
-  if (session.isPending) {
-    return <StatusPanel kind="loading" title="正在加载商户" />;
-  }
-  if (session.isError) {
-    return <Navigate replace to="/login" />;
-  }
-  const merchant = session.data.merchant;
-  if (merchant.id !== merchantId) {
-    return <StatusPanel kind="forbidden" title="无权访问该商户" />;
-  }
-
-  return <Outlet context={{ merchant }} />;
-}
-
 export function createAppRoutes(): RouteObject[] {
   const routes: RouteObject[] = [
     {
@@ -91,32 +73,30 @@ export function createAppRoutes(): RouteObject[] {
       ErrorBoundary: RouteErrorPage,
     },
     {
-      path: "/m/:merchantId",
+      path: "/workspace",
       Component: RequireSession,
       ErrorBoundary: RouteErrorPage,
       children: [
         {
-          Component: MerchantRoute,
+          Component: AppLayout,
           children: [
             {
-              Component: AppLayout,
-              children: [
-                { index: true, Component: MerchantHomePage },
-                {
-                  path: "orders",
-                  lazy: async () => ({
-                    Component: (await import("../pages/OrdersPage")).OrdersPage,
-                  }),
-                },
-                {
-                  path: "orders/:orderId",
-                  lazy: async () => ({
-                    Component: (await import("../pages/OrderDetailPage")).OrderDetailPage,
-                  }),
-                },
-                { path: "*", Component: NotFoundPage },
-              ],
+              index: true,
+              Component: WorkspaceHomePage,
             },
+            {
+              path: "orders",
+              lazy: async () => ({
+                Component: (await import("../pages/OrdersPage")).OrdersPage,
+              }),
+            },
+            {
+              path: "orders/:orderId",
+              lazy: async () => ({
+                Component: (await import("../pages/OrderDetailPage")).OrderDetailPage,
+              }),
+            },
+            { path: "*", Component: NotFoundPage },
           ],
         },
       ],

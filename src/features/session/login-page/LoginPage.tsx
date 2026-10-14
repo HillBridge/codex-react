@@ -18,7 +18,7 @@ export function LoginPage() {
       await queryClient.cancelQueries();
       queryClient.clear();
       queryClient.setQueryData(sessionQueryKey, session);
-      navigate(`/m/${session.merchant.id}`, { replace: true });
+      navigate("/workspace", { replace: true });
     },
   });
 

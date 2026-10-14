@@ -57,7 +57,7 @@ describe("LoginPage", () => {
         }),
       ),
     );
-    expect(await screen.findByText("/m/merchant-east")).toBeInTheDocument();
+    expect(await screen.findByText("/workspace")).toBeInTheDocument();
     vi.unstubAllGlobals();
   });
 });

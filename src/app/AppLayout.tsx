@@ -1,12 +1,11 @@
-import { Link, Outlet, useOutletContext } from "react-router";
-import type { MerchantRouteContext } from "../features/merchant";
+import { Link, Outlet } from "react-router";
 import { useSession } from "../features/session";
 import { StatusPanel } from "../shared/ui/status-panel";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
-  const { merchant } = useOutletContext<MerchantRouteContext>();
   const session = useSession();
+  const merchant = session.data!.merchant;
 
   return (
     <div className={styles.shell}>
@@ -15,10 +14,10 @@ export function AppLayout() {
           商户工作台
         </Link>
         <nav aria-label="业务导航">
-          <Link className={styles.navItem} to={`/m/${merchant.id}`}>
+          <Link className={styles.navItem} to="/workspace">
             概览
           </Link>
-          <Link className={styles.navItem} to={`/m/${merchant.id}/orders`}>
+          <Link className={styles.navItem} to="/workspace/orders">
             订单管理
           </Link>
         </nav>
@@ -33,7 +32,7 @@ export function AppLayout() {
         </header>
         <main className={styles.content}>
           <h1>{merchant.name}</h1>
-          <Outlet context={{ merchant }} />
+          <Outlet />
         </main>
       </div>
     </div>
