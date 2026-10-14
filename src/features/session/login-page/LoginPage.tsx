@@ -8,8 +8,8 @@ import { login as loginRequest } from "../api";
 import styles from "./LoginPage.module.css";
 
 export function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("admin123");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const login = useMutation({

@@ -40,17 +40,20 @@ describe("LoginPage", () => {
     );
 
     expect(screen.getByRole("heading", { name: "登录" })).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "用户名" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "用户名" })).toHaveValue("admin");
+    expect(screen.getByLabelText("密码")).toHaveValue("admin123");
     expect(screen.queryByRole("button", { name: /进入演示/ })).not.toBeInTheDocument();
     const user = userEvent.setup();
-    await user.type(screen.getByRole("textbox", { name: "用户名" }), "admin");
-    await user.type(screen.getByLabelText("密码"), "admin123");
+    await user.clear(screen.getByRole("textbox", { name: "用户名" }));
+    await user.type(screen.getByRole("textbox", { name: "用户名" }), "viewer");
+    await user.clear(screen.getByLabelText("密码"));
+    await user.type(screen.getByLabelText("密码"), "viewer123");
     await user.click(screen.getByRole("button", { name: "登录" }));
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith(
         "/api/auth/login",
         expect.objectContaining({
-          body: JSON.stringify({ username: "admin", password: "admin123" }),
+          body: JSON.stringify({ username: "viewer", password: "viewer123" }),
         }),
       ),
     );
