@@ -2,9 +2,9 @@
 
 import { createServer, request as httpRequest } from "node:http";
 import type { AddressInfo } from "node:net";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "../app";
-import { sessionCookieOptions } from "../auth/session";
+import { sessionCookieOptions, sessionTtlMs } from "../auth/session";
 import { resetDemoStore } from "../data/store";
 
 const servers: ReturnType<typeof createServer>[] = [];
@@ -12,6 +12,7 @@ const servers: ReturnType<typeof createServer>[] = [];
 beforeEach(() => resetDemoStore());
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await Promise.all(
     servers.splice(0).map(
       (server) =>
@@ -114,6 +115,27 @@ describe("authentication routes", () => {
 
     const expired = await request("/api/session", { headers: { cookie } });
     expect(expired.status).toBe(401);
+  });
+
+  it("expires the session two hours after login", async () => {
+    const login = await request(
+      "/api/auth/login",
+      json({ username: "admin", password: "admin123" }, { method: "POST" }),
+    );
+    const setCookie = String(login.headers["set-cookie"] ?? "");
+    const cookie = setCookie.split(";", 1)[0];
+    expect(sessionTtlMs).toBe(7_200_000);
+    expect(setCookie).toMatch(/expires=/i);
+
+    const loggedInAt = Date.now();
+    vi.spyOn(Date, "now").mockReturnValue(loggedInAt + sessionTtlMs - 1_000);
+    const stillValid = await request("/api/session", { headers: { cookie } });
+    expect(stillValid.status).toBe(200);
+
+    vi.spyOn(Date, "now").mockReturnValue(loggedInAt + sessionTtlMs + 1_000);
+    const expired = await request("/api/session", { headers: { cookie } });
+    expect(expired.status).toBe(401);
+    await expect(expired.json()).resolves.toMatchObject({ code: "UNAUTHENTICATED" });
   });
 
   it("rejects incomplete and invalid credentials", async () => {

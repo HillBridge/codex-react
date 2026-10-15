@@ -1,6 +1,6 @@
 import { demoUsers, initialOrders, type DemoOrder, type DemoUser } from "./demo-data";
 
-const sessions = new Map<string, DemoUser>();
+const sessions = new Map<string, { user: DemoUser; expiresAt: number }>();
 let orders: DemoOrder[] = structuredClone(initialOrders);
 
 export function findUser(username: string, password: string) {
@@ -9,12 +9,18 @@ export function findUser(username: string, password: string) {
   );
 }
 
-export function saveSession(id: string, user: DemoUser) {
-  sessions.set(id, user);
+export function saveSession(id: string, user: DemoUser, expiresAt: number) {
+  sessions.set(id, { user, expiresAt });
 }
 
 export function getSession(id: string | undefined) {
-  return id ? sessions.get(id) : undefined;
+  const session = id ? sessions.get(id) : undefined;
+  if (!session) return undefined;
+  if (session.expiresAt <= Date.now()) {
+    sessions.delete(id!);
+    return undefined;
+  }
+  return session.user;
 }
 
 export function deleteSession(id: string | undefined) {

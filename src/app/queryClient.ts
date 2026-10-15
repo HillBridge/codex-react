@@ -1,3 +1,4 @@
+import axios from "axios";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { ApiError } from "../shared/api/ApiError";
 import { notifyError } from "../shared/ui/toast";
@@ -6,7 +7,7 @@ import { notifyError } from "../shared/ui/toast";
 // 决定一个错误要不要弹 toast
 function notify(error: Error, meta: Record<string, unknown> | undefined) {
   if (meta?.silent) return;
-  if (error instanceof DOMException && error.name === "AbortError") return;
+  if (axios.isCancel(error)) return;
   if (error instanceof ApiError) {
     if (error.status === 401) return;
     notifyError({ message: error.message, requestId: error.requestId });

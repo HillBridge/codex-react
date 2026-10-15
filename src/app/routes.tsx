@@ -9,9 +9,10 @@ import {
 } from "react-router";
 import { LoginPage } from "../pages/login-page";
 import { WorkspaceHomePage } from "../pages/workspace-home-page";
-import { useSession } from "../features/session";
+import { sessionQueryKey, useSession } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
 import { StatusPanel } from "../shared/ui/status-panel";
+import { notifyWarning } from "../shared/ui/toast";
 import { AppLayout, NotFoundPage, RouteErrorPage } from "./AppLayout";
 
 function isUnauthorized(error: unknown) {
@@ -60,7 +61,14 @@ function RequireSession() {
 
   useEffect(() => {
     const expireSession = () => {
+      // 只有确实登录过（缓存里有会话）才提示；首次访问未登录的 401 不提示。
+      // 多个请求同时 401 时，首个事件清缓存后，后续事件不会再提示。
+      const hadSession = queryClient.getQueryData(sessionQueryKey) !== undefined;
       queryClient.clear();
+      if (hadSession) {
+        // id唯一，防止重复提示的第二层兜底方案
+        notifyWarning("登录已过期，请重新登录。", { id: "session-expired" });
+      }
       navigate("/login", { replace: true });
     };
     window.addEventListener("app:session-expired", expireSession);

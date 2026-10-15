@@ -2,7 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
+import { mockHttp } from "../../../test/mockHttp";
 import { LoginPage } from "./LoginPage";
 
 function LocationProbe() {
@@ -15,20 +16,16 @@ describe("LoginPage", () => {
       defaultOptions: { queries: { retry: false } },
     });
 
-    const fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          user: { id: "user-admin", name: "运营管理员" },
-          merchant: {
-            id: "merchant-east",
-            name: "东区旗舰店",
-            permissions: ["order:read", "order:update"],
-          },
-        }),
-        { status: 200 },
-      ),
-    );
-    vi.stubGlobal("fetch", fetch);
+    const adapter = mockHttp({
+      data: {
+        user: { id: "user-admin", name: "运营管理员" },
+        merchant: {
+          id: "merchant-east",
+          name: "东区旗舰店",
+          permissions: ["order:read", "order:update"],
+        },
+      },
+    });
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -50,14 +47,14 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText("密码"), "viewer123");
     await user.click(screen.getByRole("button", { name: "登录" }));
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith(
-        "/api/auth/login",
+      expect(adapter).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: JSON.stringify({ username: "viewer", password: "viewer123" }),
+          url: "/api/auth/login",
+          method: "post",
+          data: JSON.stringify({ username: "viewer", password: "viewer123" }),
         }),
       ),
     );
     expect(await screen.findByText("/workspace")).toBeInTheDocument();
-    vi.unstubAllGlobals();
   });
 });

@@ -4,6 +4,8 @@ import type { DemoUser } from "../data/demo-data";
 import { deleteSession, getSession, saveSession } from "../data/store";
 
 export const sessionCookieName = "merchant_session";
+// 登录后固定 2 小时失效（绝对过期，不随操作续期）。
+export const sessionTtlMs = 2 * 60 * 60 * 1000;
 
 function sessionIdFrom(ctx: Context) {
   const prefix = `${sessionCookieName}=`;
@@ -27,8 +29,11 @@ export function sessionCookieOptions() {
 
 export function createSession(ctx: Context, user: DemoUser) {
   const id = randomUUID();
-  saveSession(id, user);
-  ctx.cookies.set(sessionCookieName, id, sessionCookieOptions());
+  saveSession(id, user, Date.now() + sessionTtlMs);
+  ctx.cookies.set(sessionCookieName, id, {
+    ...sessionCookieOptions(),
+    maxAge: sessionTtlMs,
+  });
 }
 
 export function currentSession(ctx: Context) {

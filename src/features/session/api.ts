@@ -2,17 +2,17 @@ import { apiRequest } from "../../shared/api/request";
 import type { Session } from "./types";
 
 export function getSession() {
-  return apiRequest<Session>("/api/session");
+  return apiRequest<Session>({ url: "/api/session" });
 }
 
 export function login(credentials: { username: string; password: string }) {
-  return apiRequest<Session>("/api/auth/login", {
+  return apiRequest<Session>({
+    url: "/api/auth/login",
     method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(credentials),
+    data: credentials,
   });
 }
 
 export function logout() {
-  return apiRequest<void>("/api/auth/logout", { method: "POST" });
+  return apiRequest<void>({ url: "/api/auth/logout", method: "POST" });
 }

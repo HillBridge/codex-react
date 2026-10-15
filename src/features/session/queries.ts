@@ -6,7 +6,7 @@ export const sessionQueryKey = ["session"] as const;
 export function sessionQueryOptions() {
   return queryOptions({
     queryKey: sessionQueryKey,
-    queryFn: getSession,
+    queryFn: getSession, // queryKey不存在会执行 | staleTime 失效后也会执行
     meta: { silent: true },
     staleTime: 30_000,
     retry: (failureCount: number, error: { status?: number }) =>

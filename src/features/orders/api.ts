@@ -6,19 +6,23 @@ export function getOrders(
   filters: OrderFilters,
   signal?: AbortSignal,
 ) {
-  const params = new URLSearchParams({
-    status: filters.status,
-    q: filters.q,
-    page: String(filters.page),
-    pageSize: String(filters.pageSize),
-  });
-  return apiRequest<OrderListResponse>(`/api/merchants/${merchantId}/orders?${params}`, {
+  return apiRequest<OrderListResponse>({
+    url: `/api/merchants/${merchantId}/orders`,
+    params: {
+      status: filters.status,
+      q: filters.q,
+      page: filters.page,
+      pageSize: filters.pageSize,
+    },
     signal,
   });
 }
 
 export function getOrder(merchantId: string, orderId: string, signal?: AbortSignal) {
-  return apiRequest<Order>(`/api/merchants/${merchantId}/orders/${orderId}`, { signal });
+  return apiRequest<Order>({
+    url: `/api/merchants/${merchantId}/orders/${orderId}`,
+    signal,
+  });
 }
 
 export function updateOrderStatus(
@@ -27,9 +31,9 @@ export function updateOrderStatus(
   status: OrderStatus,
   expectedVersion: number,
 ) {
-  return apiRequest<Order>(`/api/merchants/${merchantId}/orders/${orderId}/status`, {
+  return apiRequest<Order>({
+    url: `/api/merchants/${merchantId}/orders/${orderId}/status`,
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status, expectedVersion }),
+    data: { status, expectedVersion },
   });
 }
