@@ -1,11 +1,24 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet } from "react-router";
-import { useSession } from "../features/session";
+import { useNavigate } from "react-router";
+import { logout, useSession } from "../features/session";
+import { Button } from "../shared/ui/button";
 import { StatusPanel } from "../shared/ui/status-panel";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
   const session = useSession();
   const merchant = session.data!.merchant;
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: async () => {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      navigate("/login", { replace: true });
+    },
+  });
 
   return (
     <div className={styles.shell}>
@@ -28,10 +41,24 @@ export function AppLayout() {
           <span>商户管理控制台</span>
           <div className={styles.accountArea}>
             <span>{session.data?.user.name}</span>
+            <Button
+              isDisabled={logoutMutation.isPending}
+              onPress={() => logoutMutation.mutate()}
+              variant="secondary"
+            >
+              退出登录
+            </Button>
           </div>
         </header>
         <main className={styles.content}>
           <h1>{merchant.name}</h1>
+          {logoutMutation.isError ? (
+            <StatusPanel
+              kind="error"
+              title="退出失败"
+              description={logoutMutation.error.message}
+            />
+          ) : null}
           <Outlet />
         </main>
       </div>

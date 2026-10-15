@@ -12,3 +12,7 @@ export function login(credentials: { username: string; password: string }) {
     body: JSON.stringify(credentials),
   });
 }
+
+export function logout() {
+  return apiRequest<void>("/api/auth/logout", { method: "POST" });
+}
