@@ -14,7 +14,6 @@ export function AppLayout() {
   const navigate = useNavigate();
   const logoutMutation = useMutation({
     mutationFn: logout,
-    meta: { silent: true },
     onSuccess: async () => {
       await queryClient.cancelQueries();
       queryClient.clear();
@@ -55,13 +54,6 @@ export function AppLayout() {
         </header>
         <main className={styles.content}>
           <h1>{merchant.name}</h1>
-          {logoutMutation.isError ? (
-            <StatusPanel
-              kind="error"
-              title="退出失败"
-              description={logoutMutation.error.message}
-            />
-          ) : null}
           <Outlet />
         </main>
       </div>

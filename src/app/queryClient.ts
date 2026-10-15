@@ -17,10 +17,15 @@ function notify(error: Error, meta: Record<string, unknown> | undefined) {
 export function createAppQueryClient() {
   return new QueryClient({
     queryCache: new QueryCache({
-      onError: (error, query) => notify(error, query.meta),
+      // 首次加载失败（无旧数据）由页面自己展示；已有数据时刷新失败才需要 toast。
+      onError: (error, query) => {
+        if (query.state.data === undefined) return;
+        notify(error, query.meta);
+      },
     }),
     mutationCache: new MutationCache({
-      onError: (error, _variables, _context, mutation) => notify(error, mutation.options.meta),
+      onError: (error, _variables, _context, mutation) =>
+        notify(error, mutation.options.meta),
     }),
     defaultOptions: {
       queries: {

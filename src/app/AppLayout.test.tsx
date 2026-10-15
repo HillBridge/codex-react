@@ -1,9 +1,11 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
+import { ToastViewport } from "../shared/ui/toast";
 import { AppLayout } from "./AppLayout";
+import { createAppQueryClient } from "./queryClient";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -12,9 +14,7 @@ function LocationProbe() {
 }
 
 function renderWorkspace(fetch: typeof globalThis.fetch) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
+  const queryClient = createAppQueryClient();
   queryClient.setQueryData(["session"], {
     user: { id: "user-admin", name: "运营管理员" },
     merchant: {
@@ -48,6 +48,7 @@ function renderWorkspace(fetch: typeof globalThis.fetch) {
   render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <ToastViewport />
     </QueryClientProvider>,
   );
 
@@ -83,7 +84,7 @@ describe("AppLayout logout", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "退出登录" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("退出失败");
+    expect((await screen.findAllByText("服务暂时不可用")).length).toBeGreaterThan(0);
     expect(screen.getByText("/workspace")).toBeInTheDocument();
   });
 });

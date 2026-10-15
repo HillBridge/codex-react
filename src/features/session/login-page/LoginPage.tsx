@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { Button } from "../../../shared/ui/button";
-import { StatusPanel } from "../../../shared/ui/status-panel";
+import { Alert } from "../../../shared/ui/alert";
 import { notifySuccess } from "../../../shared/ui/toast";
 import { sessionQueryKey } from "../queries";
 import { login as loginRequest } from "../api";
@@ -64,7 +64,7 @@ export function LoginPage() {
           </Button>
         </form>
         {login.isError ? (
-          <StatusPanel kind="error" title="登录失败" description={login.error.message} />
+          <Alert kind="error" title="登录失败" description={login.error.message} />
         ) : null}
       </section>
     </main>

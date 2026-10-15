@@ -7,22 +7,24 @@ export function OrderDetailPage() {
   const merchant = useSession().data!.merchant;
   const { orderId = "" } = useParams();
   const query = useOrder(merchant.id, orderId);
-  if (query.isPending) return <StatusPanel kind="loading" title="正在加载订单详情" />;
-  if (query.isError)
-    return (
-      <StatusPanel
-        kind="error"
-        title="订单详情加载失败"
-        onRetry={() => void query.refetch()}
-      />
-    );
   return (
     <>
       <Link to="/workspace/orders">返回订单列表</Link>
-      <OrderDetails
-        order={query.data}
-        canUpdate={merchant.permissions.includes("order:update")}
-      />
+      {query.data ? (
+        <OrderDetails
+          order={query.data}
+          canUpdate={merchant.permissions.includes("order:update")}
+        />
+      ) : query.isError ? (
+        <StatusPanel
+          kind="error"
+          title="订单详情加载失败"
+          description={query.error.message}
+          onRetry={() => void query.refetch()}
+        />
+      ) : (
+        <StatusPanel kind="loading" title="正在加载订单详情" />
+      )}
     </>
   );
 }

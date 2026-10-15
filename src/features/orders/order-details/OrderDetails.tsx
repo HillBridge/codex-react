@@ -1,5 +1,5 @@
 import { Button } from "../../../shared/ui/button";
-import { StatusPanel } from "../../../shared/ui/status-panel";
+import { Alert } from "../../../shared/ui/alert";
 import { ApiError } from "../../../shared/api/ApiError";
 import { useUpdateOrderStatus } from "../mutations";
 import type { Order } from "../types";
@@ -11,17 +11,10 @@ export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: bo
   return (
     <>
       {conflict ? (
-        <StatusPanel
-          kind="error"
+        <Alert
+          kind="warning"
           title="订单已被其他操作更新"
           description="页面已重新读取最新数据，请确认后再操作。"
-        />
-      ) : null}
-      {mutation.isError && !conflict ? (
-        <StatusPanel
-          kind="error"
-          title="订单更新失败"
-          description={mutation.error.message}
         />
       ) : null}
       <dl className={styles.detail}>

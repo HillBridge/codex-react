@@ -18,6 +18,13 @@ function isUnauthorized(error: unknown) {
   return error instanceof ApiError && error.status === 401;
 }
 
+function sessionErrorDescription(error: unknown) {
+  const requestId = error instanceof ApiError ? error.requestId : undefined;
+  return requestId
+    ? `无法获取登录状态，请稍后重试。请求编号：${requestId}`
+    : "无法获取登录状态，请检查网络或稍后重试。";
+}
+
 function RootRedirect() {
   const session = useSession();
   if (session.isPending) {
@@ -28,7 +35,14 @@ function RootRedirect() {
     if (isUnauthorized(session.error)) {
       return <Navigate replace to="/login" />;
     }
-    return <StatusPanel kind="error" title="无法读取登录状态" />;
+    return (
+      <StatusPanel
+        kind="error"
+        title="服务暂时不可用"
+        description={sessionErrorDescription(session.error)}
+        onRetry={() => void session.refetch()}
+      />
+    );
   }
 
   return <Navigate replace to="/workspace" />;
@@ -59,8 +73,16 @@ function RequireSession() {
   if (unauthorized) {
     return <Navigate replace to="/login" />;
   }
-  if (session.isError) {
-    return <StatusPanel kind="error" title="登录状态无效" />;
+  // 已有会话数据时，后台刷新失败不应拆掉整个工作区。
+  if (session.isError && !session.data) {
+    return (
+      <StatusPanel
+        kind="error"
+        title="服务暂时不可用"
+        description={sessionErrorDescription(session.error)}
+        onRetry={() => void session.refetch()}
+      />
+    );
   }
   return <Outlet />;
 }
