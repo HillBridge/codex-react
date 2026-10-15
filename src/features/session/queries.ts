@@ -7,6 +7,7 @@ export function sessionQueryOptions() {
   return queryOptions({
     queryKey: sessionQueryKey,
     queryFn: getSession,
+    meta: { silent: true },
     staleTime: 30_000,
     retry: (failureCount: number, error: { status?: number }) =>
       error.status !== 401 && failureCount < 1,

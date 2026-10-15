@@ -27,11 +27,12 @@
     "koa": "^3.2.1",
     "koa-bodyparser": "^4.4.1",
     "koa-static": "^5.0.0",
-    "tsx": "^4.23.15",
     "react": "^19.3.0",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.0",
-    "react-router": "^8.4.0"
+    "react-router": "^8.4.0",
+    "sonner": "^2.0.8",
+    "tsx": "^4.23.15"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

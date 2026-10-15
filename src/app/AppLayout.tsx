@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { logout, useSession } from "../features/session";
 import { Button } from "../shared/ui/button";
 import { StatusPanel } from "../shared/ui/status-panel";
+import { notifySuccess } from "../shared/ui/toast";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
@@ -13,9 +14,11 @@ export function AppLayout() {
   const navigate = useNavigate();
   const logoutMutation = useMutation({
     mutationFn: logout,
+    meta: { silent: true },
     onSuccess: async () => {
       await queryClient.cancelQueries();
       queryClient.clear();
+      notifySuccess("已退出登录");
       navigate("/login", { replace: true });
     },
   });

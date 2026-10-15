@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { Button } from "../../../shared/ui/button";
 import { StatusPanel } from "../../../shared/ui/status-panel";
+import { notifySuccess } from "../../../shared/ui/toast";
 import { sessionQueryKey } from "../queries";
 import { login as loginRequest } from "../api";
 import styles from "./LoginPage.module.css";
@@ -14,10 +15,12 @@ export function LoginPage() {
   const navigate = useNavigate();
   const login = useMutation({
     mutationFn: loginRequest,
+    meta: { silent: true },
     onSuccess: async (session) => {
       await queryClient.cancelQueries();
       queryClient.clear();
       queryClient.setQueryData(sessionQueryKey, session);
+      notifySuccess("登录成功");
       navigate("/workspace", { replace: true });
     },
   });

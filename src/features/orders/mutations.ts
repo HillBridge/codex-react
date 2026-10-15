@@ -6,6 +6,7 @@ import type { OrderStatus } from "./types";
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { silent: true },
     mutationFn: (input: {
       merchantId: string;
       orderId: string;
