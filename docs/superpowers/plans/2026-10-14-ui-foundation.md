@@ -21,7 +21,7 @@
 
 ## Review Focus
 
-- The standalone `/dev-login` route must receive the global tokens and document defaults after imports move out of `AppLayout.tsx`; pin with a Playwright assertion on `--color-primary` and computed body defaults (`min-width: 280px`) in Task 1.
+- The standalone `/login` route must receive the global tokens and document defaults after imports move out of `AppLayout.tsx`; pin with a Playwright assertion on `--color-primary` and computed body defaults (`min-width: 280px`) in Task 1.
 - The token declaration file must remain the allowed home for literal design values while ordinary component styles reject literal colors; pin with a Stylelint run against both files in Task 2.
 - CSS Modules selectors, including React Aria `data-*` state selectors, must lint without needing global selector escapes; pin by running Stylelint across all `src/**/*.css` in Task 2.
 - Required CSS keywords such as `transparent` and `currentColor` must remain usable without a broad lint disable; pin with a Stylelint stdin probe in Task 2.
@@ -38,14 +38,14 @@
 - Modify: `src/main.tsx` — import both global styles once at the application entry.
 - Create: `docs/ui-guidelines.md` — summarize ownership layers, token rules, CSS Modules/React Aria state styling, shared component boundaries, accessibility, responsive and localization considerations, theme guidance, and PR checklist.
 - Modify: `README.md` — link the UI guidelines from the project documentation.
-- Modify: `tests/e2e/merchant-orders.spec.ts` — assert global styles are present on `/dev-login`, outside `AppLayout`.
+- Modify: `tests/e2e/merchant-orders.spec.ts` — assert global styles are present on `/login`, outside `AppLayout`.
 
 **Interfaces:**
 
 - Consumes: approved design in `docs/superpowers/specs/2026-10-14-ui-foundation-design.md`.
 - Produces: global style imports at `src/main.tsx`; a standalone global stylesheet at `src/app/styles/global.css`; contributor guidance at `docs/ui-guidelines.md`.
 
-- [x] **Step 1: Add a browser regression test named `global styles load on standalone login`.** After navigating to `/dev-login`, assert `getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim()` equals `"#1677ff"` and `getComputedStyle(document.body).minWidth` equals `"280px"` (`20rem` at the 14px root font size).
+- [x] **Step 1: Add a browser regression test named `global styles load on standalone login`.** After navigating to `/login`, assert `getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim()` equals `"#1677ff"` and `getComputedStyle(document.body).minWidth` equals `"280px"` (`20rem` at the 14px root font size).
 - [x] **Step 2: Run the focused browser test.**
 
 Run: `pnpm test:e2e --grep "global styles load on standalone login"`
@@ -58,7 +58,7 @@ Expected: the new assertion passes against current behavior; it protects the sty
 
 Run: `pnpm test:e2e --grep "global styles load on standalone login"`
 
-Expected: PASS with global tokens/defaults available on `/dev-login`.
+Expected: PASS with global tokens/defaults available on `/login`.
 
 Run: `pnpm check && pnpm test:e2e`
 

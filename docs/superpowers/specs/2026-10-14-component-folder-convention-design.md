@@ -53,7 +53,7 @@ src/features/orders/
 └── orders.integration.test.tsx
 ```
 
-The same component-folder pattern applies to `MerchantSwitcher` and `DevLoginPage` in their owning features. A component-local `index.ts` exports the component and its public types only when present. Feature root `index.ts` files remain the public boundary for feature-owned components; `shared/ui` consumers import from each component directory. Do not add an extra `components/` level solely to group these folders.
+The same component-folder pattern applies to `MerchantSwitcher` in its owning feature. A component-local `index.ts` exports the component and its public types only when present. Feature root `index.ts` files remain the public boundary for feature-owned components; `shared/ui` consumers import from each component directory. Do not add an extra `components/` level solely to group these folders.
 
 ## Style and Test Ownership
 

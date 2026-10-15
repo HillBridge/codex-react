@@ -84,7 +84,7 @@ tests/e2e/               Playwright 关键业务流程
 
 ## Task 4: 会话与商户上下文
 
-**Files:** `src/features/session/types.ts`, `src/features/session/api.ts`, `src/features/session/queries.ts`, `src/features/session/DevLoginPage.tsx`, `src/features/session/index.ts`, `src/features/merchant/types.ts`, `src/features/merchant/api.ts`, `src/features/merchant/queries.ts`, `src/features/merchant/MerchantSwitcher.tsx`, `src/features/merchant/index.ts`, `src/pages/LoginPage.tsx`, `src/pages/MerchantHomePage.tsx`, feature tests。
+**Files:** `src/features/session/types.ts`, `src/features/session/api.ts`, `src/features/session/queries.ts`, `src/features/session/index.ts`, `src/features/merchant/types.ts`, `src/features/merchant/api.ts`, `src/features/merchant/queries.ts`, `src/features/merchant/MerchantSwitcher.tsx`, `src/features/merchant/index.ts`, `src/pages/LoginPage.tsx`, `src/pages/MerchantHomePage.tsx`, feature tests。
 
 **Interfaces:** `Session { user: { id: string; name: string } }`; `Merchant { id: string; name: string; permissions: string[] }`; `useSession()`, `useMerchants()`, `MerchantSwitcher` 通过路由导航切换商户。
 

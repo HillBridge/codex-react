@@ -154,10 +154,6 @@ git commit -m "feat: add authorized order api"
 - Modify: `src/shared/api/request.test.ts`
 - Modify: `src/features/session/api.ts`
 - Modify: `src/features/session/types.ts`
-- Move: `src/features/session/dev-login-page/DevLoginPage.tsx` to `src/features/session/login-page/LoginPage.tsx`
-- Move: `src/features/session/dev-login-page/DevLoginPage.module.css` to `src/features/session/login-page/LoginPage.module.css`
-- Move: `src/features/session/dev-login-page/DevLoginPage.test.tsx` to `src/features/session/login-page/LoginPage.test.tsx`
-- Replace: `src/features/session/dev-login-page/index.ts` with `src/features/session/login-page/index.ts`
 - Modify: `src/features/session/index.ts`
 - Modify: `src/pages/LoginPage.tsx`
 - Modify: `src/test/setup.ts`
@@ -177,7 +173,7 @@ Expected: FAIL，因为 `login`、新的 session 类型与表单页面尚不存�
 
 - [x] **Step 3: 实现类型化登录和表单 UI**
 
-让 `request.ts` 继续为唯一 fetch 入口，设置 JSON accept header、保留 credentials 与 session-expired 事件。用 React Aria 文本输入和密码输入实现登录表单，禁用重复提交，展示服务端错误；成功后清理旧 query cache、缓存 session，并导航到 `/m/${session.merchant.id}`。将开发演示文案、身份按钮和 `/api/dev-login` 全部替换。
+让 `request.ts` 继续为唯一 fetch 入口，设置 JSON accept header、保留 credentials 与 session-expired 事件。用 React Aria 文本输入和密码输入实现登录表单，禁用重复提交，展示服务端错误；成功后清理旧 query cache、缓存 session，并导航到 `/m/${session.merchant.id}`。替换开发演示文案和身份按钮。
 
 - [x] **Step 4: 运行前端 API 与登录测试并确认通过**
 
@@ -223,7 +219,7 @@ Expected: FAIL，因为路由仍请求 merchants 并渲染 MerchantSwitcher。
 
 - [x] **Step 3: 移除商户列表依赖并收敛上下文**
 
-将 `/dev-login` 更换为始终存在的 `/login`。`RootRedirect`、`RequireSession` 和 `MerchantRoute` 都以 `useSession()` 为唯一身份来源；若 URL merchant ID 与 session merchant ID 不同，显示 forbidden。`MerchantRouteContext` 只保留 `merchant`，AppLayout 从 session 显示用户名称，移除全部 MerchantSwitcher 导入、目录和 merchant API/query 导出。
+将开发登录路由更换为始终存在的 `/login`。`RootRedirect`、`RequireSession` 和 `MerchantRoute` 都以 `useSession()` 为唯一身份来源；若 URL merchant ID 与 session merchant ID 不同，显示 forbidden。`MerchantRouteContext` 只保留 `merchant`，AppLayout 从 session 显示用户名称，移除全部 MerchantSwitcher 导入、目录和 merchant API/query 导出。
 
 - [x] **Step 4: 运行路由测试并确认通过**
 
@@ -261,7 +257,7 @@ git commit -m "refactor: use session scoped merchant"
 - [x] **Step 2: 运行 Playwright 测试并确认失败**
 
 Run: `pnpm test:e2e`
-Expected: FAIL，因为 Playwright 尚未启动 Koa、旧测试仍访问 `/dev-login` 或 MSW。
+Expected: FAIL，因为 Playwright 尚未启动 Koa、旧测试仍访问淘汰的登录流程或 MSW。
 
 - [x] **Step 3: 删除 MSW 并配置真实双服务测试**
 
@@ -274,7 +270,7 @@ Expected: PASS，管理员真实登录、订单筛选/状态修改与只读限�
 
 - [x] **Step 5: 扫描运行时代码的 MSW 遗留并运行完整质量门禁**
 
-Run: `! rg -n -i "msw|mockServiceWorker|dev-login|MerchantSwitcher" src backend public tests package.json vite.config.ts playwright.config.ts README.md && pnpm check && pnpm test:e2e`
+Run: `! rg -n -i "msw|mockServiceWorker|MerchantSwitcher" src backend public tests package.json vite.config.ts playwright.config.ts README.md && pnpm check && pnpm test:e2e`
 Expected: `rg` 无匹配；格式、样式、类型、lint、单测、构建与端到端测试全部通过。
 
 - [x] **Step 6: 提交清理与联调配置**
@@ -288,5 +284,5 @@ git commit -m "chore: replace msw with koa backend"
 
 - [x] 运行 `pnpm check`，确认格式、样式、类型、lint、单测和生产构建全部通过。
 - [x] 运行 `pnpm test:e2e`，确认浏览器真实调用 Koa 的登录、订单筛选、详情和状态变更流程通过。
-- [x] 运行 `! rg -n -i "msw|mockServiceWorker|dev-login|MerchantSwitcher" src backend public tests package.json vite.config.ts playwright.config.ts README.md`，确认运行时代码、测试、配置和 README 不再引用被删除方案。
+- [x] 运行 `! rg -n -i "msw|mockServiceWorker|MerchantSwitcher" src backend public tests package.json vite.config.ts playwright.config.ts README.md`，确认运行时代码、测试、配置和 README 不再引用被删除方案。
 - [x] 运行 `git status --short`，确认无意外生成物；检查 `git log --oneline -6`，确认任务提交完整。

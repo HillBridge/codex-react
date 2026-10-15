@@ -1,13 +1,13 @@
 import { useSearchParams } from "react-router";
-import { useSession } from "../features/session";
+import { useSession } from "../../features/session";
 import {
   OrderFilters,
   OrderTable,
   useOrders,
   parseOrderFilters,
-} from "../features/orders";
-import { StatusPanel } from "../shared/ui/status-panel";
-import { Button } from "../shared/ui/button";
+} from "../../features/orders";
+import { Button } from "../../shared/ui/button";
+import { StatusPanel } from "../../shared/ui/status-panel";
 import styles from "./OrdersPage.module.css";
 
 export function OrdersPage() {

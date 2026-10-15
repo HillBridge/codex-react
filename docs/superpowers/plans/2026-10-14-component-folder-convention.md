@@ -66,7 +66,7 @@ Expected: formatting, Stylelint, typecheck, ESLint, all unit tests, and producti
 - [x] **Step 5: Commit Task 1.** Stage only shared UI moves, affected imports, and the guideline update.
 
 ```bash
-git add -- src/shared/ui/Button.tsx src/shared/ui/Button.module.css src/shared/ui/Button.test.tsx src/shared/ui/button src/shared/ui/StatusPanel.tsx src/shared/ui/StatusPanel.module.css src/shared/ui/StatusPanel.test.tsx src/shared/ui/status-panel src/app/AppLayout.tsx src/app/routes.tsx src/features/session/DevLoginPage.tsx src/features/orders/OrderDetails.tsx src/pages/OrderDetailPage.tsx src/pages/OrdersPage.tsx docs/ui-guidelines.md
+git add -- src/shared/ui/Button.tsx src/shared/ui/Button.module.css src/shared/ui/Button.test.tsx src/shared/ui/button src/shared/ui/StatusPanel.tsx src/shared/ui/StatusPanel.module.css src/shared/ui/StatusPanel.test.tsx src/shared/ui/status-panel src/app/AppLayout.tsx src/app/routes.tsx src/features/orders/OrderDetails.tsx src/pages/OrderDetailPage.tsx src/pages/OrdersPage.tsx docs/ui-guidelines.md
 git commit -m "refactor: group shared UI component files"
 ```
 
@@ -78,20 +78,16 @@ git commit -m "refactor: group shared UI component files"
 - Move: `src/features/merchant/MerchantSwitcher.module.css` → `src/features/merchant/merchant-switcher/MerchantSwitcher.module.css`
 - Create: `src/features/merchant/merchant-switcher/index.ts`
 - Create: `src/features/merchant/merchant-switcher/MerchantSwitcher.test.tsx`
-- Move: `src/features/session/DevLoginPage.tsx` → `src/features/session/dev-login-page/DevLoginPage.tsx`
-- Move: `src/features/session/DevLoginPage.module.css` → `src/features/session/dev-login-page/DevLoginPage.module.css`
-- Create: `src/features/session/dev-login-page/index.ts`
-- Create: `src/features/session/dev-login-page/DevLoginPage.test.tsx`
 - Modify: `src/features/merchant/index.ts`, `src/features/session/index.ts`
 
 **Interfaces:**
 
 - Consumes: shared UI imports from Task 1; domain types/API/query modules remain at each feature root.
-- Produces: existing feature-root exports remain stable (`MerchantSwitcher`, `DevLoginPage`).
+- Produces: existing feature-root exports remain stable (`MerchantSwitcher`).
 
-- [x] **Step 1: Add component behavior tests at the target locations.** `MerchantSwitcher.test.tsx` verifies selecting another merchant navigates to that merchant's route; `DevLoginPage.test.tsx` verifies the development login heading and both role buttons render with real router/query providers.
+- [x] **Step 1: Add component behavior tests at the target locations.** `MerchantSwitcher.test.tsx` verifies selecting another merchant navigates to that merchant's route.
 
-Run: `pnpm exec vitest run src/features/merchant/merchant-switcher/MerchantSwitcher.test.tsx src/features/session/dev-login-page/DevLoginPage.test.tsx`
+Run: `pnpm exec vitest run src/features/merchant/merchant-switcher/MerchantSwitcher.test.tsx`
 
 Expected: FAIL because the new component module paths do not exist yet.
 
@@ -99,7 +95,7 @@ Expected: FAIL because the new component module paths do not exist yet.
 - [x] **Step 3: Add local component exports and preserve feature exports.** Add `index.ts` files and update the merchant/session feature barrels to export from the new locations; do not change consumers of `src/features/merchant` or `src/features/session`.
 - [x] **Step 4: Run focused component tests and project checks.**
 
-Run: `pnpm exec vitest run src/features/merchant/merchant-switcher/MerchantSwitcher.test.tsx src/features/session/dev-login-page/DevLoginPage.test.tsx src/features/session/session.integration.test.tsx`
+Run: `pnpm exec vitest run src/features/merchant/merchant-switcher/MerchantSwitcher.test.tsx src/features/session/session.integration.test.tsx`
 
 Expected: both component tests and session flow tests pass.
 
@@ -110,7 +106,7 @@ Expected: all project checks pass with no imports to the old component paths.
 - [x] **Step 5: Commit Task 2.**
 
 ```bash
-git add -- src/features/merchant/MerchantSwitcher.tsx src/features/merchant/MerchantSwitcher.module.css src/features/merchant/merchant-switcher src/features/merchant/index.ts src/features/session/DevLoginPage.tsx src/features/session/DevLoginPage.module.css src/features/session/dev-login-page src/features/session/index.ts
+git add -- src/features/merchant/MerchantSwitcher.tsx src/features/merchant/MerchantSwitcher.module.css src/features/merchant/merchant-switcher src/features/merchant/index.ts src/features/session/index.ts
 git commit -m "refactor: group merchant and session components"
 ```
 

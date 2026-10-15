@@ -7,8 +7,8 @@ import {
   type RouteObject,
   useNavigate,
 } from "react-router";
-import { LoginPage } from "../pages/LoginPage";
-import { WorkspaceHomePage } from "../pages/WorkspaceHomePage";
+import { LoginPage } from "../pages/login-page";
+import { WorkspaceHomePage } from "../pages/workspace-home-page";
 import { useSession } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
 import { StatusPanel } from "../shared/ui/status-panel";
@@ -87,13 +87,13 @@ export function createAppRoutes(): RouteObject[] {
             {
               path: "orders",
               lazy: async () => ({
-                Component: (await import("../pages/OrdersPage")).OrdersPage,
+                Component: (await import("../pages/orders-page")).OrdersPage,
               }),
             },
             {
               path: "orders/:orderId",
               lazy: async () => ({
-                Component: (await import("../pages/OrderDetailPage")).OrderDetailPage,
+                Component: (await import("../pages/order-detail-page")).OrderDetailPage,
               }),
             },
             { path: "*", Component: NotFoundPage },

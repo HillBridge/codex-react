@@ -1,4 +1,4 @@
-import { useSession } from "../features/session";
+import { useSession } from "../../features/session";
 import styles from "./WorkspaceHomePage.module.css";
 
 export function WorkspaceHomePage() {
