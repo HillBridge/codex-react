@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, type QueryClient } from "@tanstack/react-query";
 import { getSession } from "./api";
 
 export const sessionQueryKey = ["session"] as const;
@@ -16,4 +16,10 @@ export function sessionQueryOptions() {
 
 export function useSession() {
   return useQuery(sessionQueryOptions());
+}
+
+// 登录/退出切换身份时调用：先取消在途请求，避免晚到的响应写回刚清空的缓存。
+export async function resetQueryCache(queryClient: QueryClient) {
+  await queryClient.cancelQueries();
+  queryClient.clear();
 }

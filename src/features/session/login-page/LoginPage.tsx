@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { Button } from "../../../shared/ui/button";
 import { Alert } from "../../../shared/ui/alert";
 import { notifySuccess } from "../../../shared/ui/toast";
-import { sessionQueryKey } from "../queries";
+import { resetQueryCache, sessionQueryKey } from "../queries";
 import { login as loginRequest } from "../api";
 import styles from "./LoginPage.module.css";
 
@@ -17,8 +17,9 @@ export function LoginPage() {
     mutationFn: loginRequest,
     meta: { silent: true },
     onSuccess: async (session) => {
-      await queryClient.cancelQueries();
-      queryClient.clear();
+      // 取消在途查询并清除所有缓存
+      await resetQueryCache(queryClient);
+      // 设置新的 session
       queryClient.setQueryData(sessionQueryKey, session);
       notifySuccess("登录成功");
       navigate("/workspace", { replace: true });

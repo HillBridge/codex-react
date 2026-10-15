@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet } from "react-router";
 import { useNavigate } from "react-router";
-import { logout, useSession } from "../features/session";
+import { logout, resetQueryCache, useSession } from "../features/session";
 import { Button } from "../shared/ui/button";
 import { StatusPanel } from "../shared/ui/status-panel";
 import { notifySuccess } from "../shared/ui/toast";
@@ -15,8 +15,7 @@ export function AppLayout() {
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: async () => {
-      await queryClient.cancelQueries();
-      queryClient.clear();
+      await resetQueryCache(queryClient);
       notifySuccess("已退出登录");
       navigate("/login", { replace: true });
     },

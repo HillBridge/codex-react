@@ -3,6 +3,7 @@ import { ApiError } from "../shared/api/ApiError";
 import { notifyError } from "../shared/ui/toast";
 
 // 401 已由 app:session-expired 跳转登录；meta.silent 表示调用方自行展示错误。
+// 决定一个错误要不要弹 toast
 function notify(error: Error, meta: Record<string, unknown> | undefined) {
   if (meta?.silent) return;
   if (error instanceof DOMException && error.name === "AbortError") return;
@@ -15,6 +16,7 @@ function notify(error: Error, meta: Record<string, unknown> | undefined) {
 }
 
 export function createAppQueryClient() {
+  // 配置全局的缓存策略、重试策略、错误处理回调等。
   return new QueryClient({
     queryCache: new QueryCache({
       // 首次加载失败（无旧数据）由页面自己展示；已有数据时刷新失败才需要 toast。
