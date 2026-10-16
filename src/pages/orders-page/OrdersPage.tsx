@@ -17,6 +17,7 @@ export function OrdersPage() {
   const query = useOrders(merchant.id, filters);
   const total = query.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / filters.pageSize));
+
   const move = (page: number) => {
     const next = new URLSearchParams(params);
     next.set("page", String(page));
