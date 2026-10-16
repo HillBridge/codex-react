@@ -28,6 +28,7 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --shadow-popover: 0 6px 16px rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%);
+  --color-overlay: rgb(0 0 0 / 45%);
   --shadow-card: 0 1.25rem 3rem rgb(16 24 40 / 8%);
   --control-height-sm: 2rem;
   --control-height: 2rem;

@@ -22,6 +22,7 @@ describe("parseOrderFilters", () => {
       page: 1,
       pageSize: 20,
     });
+    expect(parseOrderFilters(new URLSearchParams("")).pageSize).toBe(10);
   });
 });
 

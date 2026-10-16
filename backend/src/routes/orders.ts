@@ -1,6 +1,6 @@
 import Router from "@koa/router";
 import { requireUser } from "../auth/require-user";
-import { findOrder, listOrders, updateOrder } from "../data/store";
+import { deleteOrder, findOrder, listOrders, updateOrder } from "../data/store";
 import { ApiHttpError } from "../lib/errors";
 
 export const orderRouter = new Router({ prefix: "/api/merchants/:merchantId" });
@@ -73,4 +73,17 @@ orderRouter.patch("/orders/:orderId/status", (ctx) => {
   )
     throw new ApiHttpError(409, "INVALID_ORDER_TRANSITION", "当前订单状态不支持此操作。");
   ctx.body = updateOrder(order, body.status as "confirmed" | "cancelled");
+});
+
+orderRouter.delete("/orders/:orderId", (ctx) => {
+  const user = requireUser(ctx);
+  if (
+    ctx.params.merchantId !== user.merchant.id ||
+    !user.merchant.permissions.includes("order:delete")
+  )
+    throw new ApiHttpError(403, "ORDER_DELETE_FORBIDDEN", "无权删除订单。");
+  const order = findOrder(ctx.params.orderId, user.merchant.id);
+  if (!order) throw new ApiHttpError(404, "ORDER_NOT_FOUND", "订单不存在。");
+  deleteOrder(order);
+  ctx.status = 204;
 });

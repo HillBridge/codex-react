@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import type { DataTableColumn } from "@/shared/ui/data-table";
+import { Button } from "@/shared/ui/button";
+import { TableActions, type DataTableColumn } from "@/shared/ui/data-table";
 import type { TableFilterField } from "@/shared/ui/table-filter";
 import type { Order, OrderStatus } from "./types";
 
@@ -9,7 +10,15 @@ const statusLabels: Record<OrderStatus, string> = {
   cancelled: "已取消",
 };
 
-export const orderColumns: DataTableColumn<Order>[] = [
+interface OrderColumnOptions {
+  canDelete: boolean;
+  onDelete: (order: Order) => void;
+}
+
+export const getOrderColumns = ({
+  canDelete,
+  onDelete,
+}: OrderColumnOptions): DataTableColumn<Order>[] => [
   { key: "number", header: "订单号", isRowHeader: true, cell: (order) => order.number },
   {
     key: "createdAt",
@@ -25,7 +34,20 @@ export const orderColumns: DataTableColumn<Order>[] = [
   {
     key: "actions",
     header: "操作",
-    cell: (order) => <Link to={order.id}>查看详情</Link>,
+    cell: (order) => (
+      <TableActions>
+        <Link to={order.id}>查看详情</Link>
+        {canDelete ? (
+          <Button
+            variant="secondary"
+            aria-label={`删除订单 ${order.number}`}
+            onPress={() => onDelete(order)}
+          >
+            删除
+          </Button>
+        ) : null}
+      </TableActions>
+    ),
   },
 ];
 

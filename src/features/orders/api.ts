@@ -37,3 +37,10 @@ export function updateOrderStatus(
     data: { status, expectedVersion },
   });
 }
+
+export function deleteOrder(merchantId: string, orderId: string) {
+  return apiRequest<void>({
+    url: `/api/merchants/${merchantId}/orders/${orderId}`,
+    method: "DELETE",
+  });
+}

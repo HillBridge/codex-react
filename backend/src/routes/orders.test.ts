@@ -155,4 +155,34 @@ describe("order routes", () => {
     });
     await expect(order.json()).resolves.toMatchObject({ status: "pending", version: 1 });
   });
+
+  it("returns 25 east orders across pages and deletes with permission", async () => {
+    const admin = await login("admin", "admin123");
+    const list = await request("/api/merchants/merchant-east/orders?page=2", {
+      headers: { cookie: admin },
+    });
+    await expect(list.json()).resolves.toMatchObject({ total: 25, pageSize: 20 });
+
+    const removed = await request("/api/merchants/merchant-east/orders/order-1002", {
+      method: "DELETE",
+      headers: { cookie: admin },
+    });
+    expect(removed.status).toBe(204);
+    expect(
+      (
+        await request("/api/merchants/merchant-east/orders/order-1002", {
+          headers: { cookie: admin },
+        })
+      ).status,
+    ).toBe(404);
+  });
+
+  it("rejects order deletion from a read-only user", async () => {
+    const viewer = await login("viewer", "viewer123");
+    const response = await request("/api/merchants/merchant-west/orders/order-2001", {
+      method: "DELETE",
+      headers: { cookie: viewer },
+    });
+    expect(response.status).toBe(403);
+  });
 });

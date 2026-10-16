@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@/shared/api/ApiError";
-import { notifyError } from "@/shared/ui/toast";
-import { updateOrderStatus } from "./api";
+import { notifyError, notifySuccess } from "@/shared/ui/toast";
+import { deleteOrder, updateOrderStatus } from "./api";
 import { orderKeys } from "./queryKeys";
 import type { OrderStatus } from "./types";
 
@@ -30,6 +30,24 @@ export function useUpdateOrderStatus() {
         queryKey: orderKeys.merchantLists(input.merchantId),
       });
       void queryClient.invalidateQueries({
+        queryKey: orderKeys.detail(input.merchantId, input.orderId),
+      });
+    },
+  });
+}
+
+export function useDeleteOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { merchantId: string; orderId: string }) =>
+      deleteOrder(input.merchantId, input.orderId),
+    onSuccess: () => notifySuccess("订单已删除"),
+    // 成功后列表已变；失败（如 404 已被删除）也需要重新拉取。
+    onSettled: (_data, _error, input) => {
+      void queryClient.invalidateQueries({
+        queryKey: orderKeys.merchantLists(input.merchantId),
+      });
+      void queryClient.removeQueries({
         queryKey: orderKeys.detail(input.merchantId, input.orderId),
       });
     },

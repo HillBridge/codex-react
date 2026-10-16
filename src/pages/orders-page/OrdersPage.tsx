@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useSession } from "@/features/session";
 import {
-  orderColumns,
+  getOrderColumns,
   orderTableFilterFields,
+  useDeleteOrder,
   useOrders,
   parseOrderFilters,
+  type Order,
 } from "@/features/orders";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table";
 import { TableFilter } from "@/shared/ui/table-filter";
 import { Pagination } from "@/shared/ui/pagination";
@@ -16,6 +20,28 @@ export function OrdersPage() {
   const { params, update, setPage, reset } = useUrlParams();
   const filters = parseOrderFilters(params);
   const query = useOrders(merchant.id, filters);
+  const deleteMutation = useDeleteOrder();
+  const [deleting, setDeleting] = useState<Order | null>(null);
+  const columns = getOrderColumns({
+    canDelete: merchant.permissions.includes("order:delete"),
+    onDelete: setDeleting,
+  });
+
+  const confirmDelete = () => {
+    if (!deleting) return;
+    deleteMutation.mutate(
+      { merchantId: merchant.id, orderId: deleting.id },
+      {
+        onSuccess: () => {
+          // 删掉最后一页唯一的一条后，当前页已不存在，退回新的最后一页。
+          const remaining = (query.data?.total ?? 1) - 1;
+          const lastPage = Math.max(1, Math.ceil(remaining / filters.pageSize));
+          if (filters.page > lastPage) setPage(lastPage);
+        },
+        onSettled: () => setDeleting(null),
+      },
+    );
+  };
 
   return (
     <>
@@ -38,7 +64,7 @@ export function OrdersPage() {
         <DataTable
           ariaLabel="订单列表"
           rows={query.data!.items}
-          columns={orderColumns}
+          columns={columns}
           getRowId={(order) => order.id}
         />
       ) : (
@@ -52,6 +78,15 @@ export function OrdersPage() {
           onChange={setPage}
         />
       ) : null}
+      <ConfirmDialog
+        isOpen={deleting !== null}
+        title="确认删除订单"
+        description={`订单 ${deleting?.number ?? ""} 删除后不可恢复。`}
+        confirmText="删除"
+        isPending={deleteMutation.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleting(null)}
+      />
     </>
   );
 }

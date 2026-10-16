@@ -1,4 +1,4 @@
-export type Permission = "order:read" | "order:update";
+export type Permission = "order:read" | "order:update" | "order:delete";
 
 export interface DemoMerchant {
   id: string;
@@ -23,7 +23,7 @@ export const demoUsers: DemoUser[] = [
     merchant: {
       id: "merchant-east",
       name: "东区旗舰店",
-      permissions: ["order:read", "order:update"],
+      permissions: ["order:read", "order:update", "order:delete"],
     },
   },
   {
@@ -48,7 +48,7 @@ export interface DemoOrder {
   status: "pending" | "confirmed" | "cancelled";
   version: number;
 }
-export const initialOrders: DemoOrder[] = [
+const baseOrders: DemoOrder[] = [
   {
     id: "order-1001",
     merchantId: "merchant-east",
@@ -77,3 +77,21 @@ export const initialOrders: DemoOrder[] = [
     version: 1,
   },
 ];
+
+const generatedStatuses: DemoOrder["status"][] = ["pending", "confirmed", "cancelled"];
+
+// 东区补足到 25 条，用于演示分页（默认每页 20 条）。
+const generatedEastOrders: DemoOrder[] = Array.from({ length: 23 }, (_, index) => {
+  const sequence = index + 3;
+  return {
+    id: `order-${1000 + sequence}`,
+    merchantId: "merchant-east",
+    number: `OD202610130${String(sequence).padStart(3, "0")}`,
+    createdAt: new Date(Date.UTC(2026, 9, 13, 8, 0) + index * 30 * 60_000).toISOString(),
+    amount: 3000 + sequence * 450,
+    status: generatedStatuses[index % generatedStatuses.length],
+    version: 1,
+  };
+});
+
+export const initialOrders: DemoOrder[] = [...baseOrders, ...generatedEastOrders];

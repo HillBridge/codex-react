@@ -43,3 +43,6 @@ export function updateOrder(order: DemoOrder, status: DemoOrder["status"]) {
   order.version += 1;
   return order;
 }
+export function deleteOrder(order: DemoOrder) {
+  orders = orders.filter((item) => item !== order);
+}

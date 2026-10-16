@@ -25,6 +25,9 @@ export interface OrderListResponse {
   pageSize: number;
 }
 
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 20;
+
 export function parseOrderFilters(params: URLSearchParams): OrderFilters {
   const rawPage = Number(params.get("page"));
   const rawPageSize = Number(params.get("pageSize"));
@@ -36,6 +39,8 @@ export function parseOrderFilters(params: URLSearchParams): OrderFilters {
     q: params.get("q")?.trim() ?? "",
     page: Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1,
     pageSize:
-      Number.isInteger(rawPageSize) && rawPageSize > 0 ? Math.min(rawPageSize, 20) : 20,
+      Number.isInteger(rawPageSize) && rawPageSize > 0
+        ? Math.min(rawPageSize, MAX_PAGE_SIZE)
+        : DEFAULT_PAGE_SIZE,
   };
 }
