@@ -1,18 +1,11 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  type RouteObject,
-  useNavigate,
-} from "react-router";
+import { createBrowserRouter, Navigate, Outlet, type RouteObject } from "react-router";
 import { LoginPage } from "../pages/login-page";
 import { WorkspaceHomePage } from "../pages/workspace-home-page";
-import { sessionQueryKey, useSession } from "../features/session";
+import { useSession, useSessionExpiry } from "../features/session";
 import { ApiError } from "../shared/api/ApiError";
 import { StatusPanel } from "../shared/ui/status-panel";
-import { notifyWarning } from "../shared/ui/toast";
 import { AppLayout, NotFoundPage, RouteErrorPage } from "./AppLayout";
 
 function isUnauthorized(error: unknown) {
@@ -51,7 +44,6 @@ function RootRedirect() {
 
 function RequireSession() {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const session = useSession();
   const unauthorized = session.isError && isUnauthorized(session.error);
 
@@ -59,21 +51,7 @@ function RequireSession() {
     if (unauthorized) queryClient.clear();
   }, [queryClient, unauthorized]);
 
-  useEffect(() => {
-    const expireSession = () => {
-      // 只有确实登录过（缓存里有会话）才提示；首次访问未登录的 401 不提示。
-      // 多个请求同时 401 时，首个事件清缓存后，后续事件不会再提示。
-      const hadSession = queryClient.getQueryData(sessionQueryKey) !== undefined;
-      queryClient.clear();
-      if (hadSession) {
-        // id唯一，防止重复提示的第二层兜底方案
-        notifyWarning("登录已过期，请重新登录。", { id: "session-expired" });
-      }
-      navigate("/login", { replace: true });
-    };
-    window.addEventListener("app:session-expired", expireSession);
-    return () => window.removeEventListener("app:session-expired", expireSession);
-  }, [navigate, queryClient]);
+  useSessionExpiry();
 
   if (session.isPending) {
     return <StatusPanel kind="loading" title="正在验证登录状态" />;

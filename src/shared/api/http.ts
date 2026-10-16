@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { ApiError } from "./ApiError";
+import { emitSessionExpired } from "./sessionExpiry";
 
 interface ErrorPayload {
   code?: string;
@@ -40,10 +41,8 @@ http.interceptors.response.use(undefined, (error: unknown) => {
     );
   }
 
-  if (response.status === 401 && typeof window !== "undefined") {
-    // 触发全局事件，通知应用层清除缓存并跳转到登录页。
-    window.dispatchEvent(new Event("app:session-expired"));
-  }
+  // 通知应用层清除缓存并跳转到登录页。
+  if (response.status === 401) emitSessionExpired();
   const payload: ErrorPayload =
     typeof response.data === "object" && response.data !== null ? response.data : {};
   const headerRequestId = response.headers?.["x-request-id"];

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { createAppRoutes } from "../../app/routes";
+import { emitSessionExpired } from "../../shared/api/sessionExpiry";
 import { notifyWarning } from "../../shared/ui/toast";
 import { mockHttp } from "../../test/mockHttp";
 
@@ -62,9 +63,9 @@ describe("session expiry", () => {
     const router = renderAt("/workspace");
     await screen.findByRole("heading", { name: "东区旗舰店" });
 
-    window.dispatchEvent(new Event("app:session-expired"));
-    window.dispatchEvent(new Event("app:session-expired"));
-    window.dispatchEvent(new Event("app:session-expired"));
+    emitSessionExpired();
+    emitSessionExpired();
+    emitSessionExpired();
 
     await waitFor(() => expect(router.state.location.pathname).toBe("/login"));
     expect(notifyWarning).toHaveBeenCalledTimes(1);

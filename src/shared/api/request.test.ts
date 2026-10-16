@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import { describe, expect, it } from "vitest";
 import { mockHttp } from "../../test/mockHttp";
 import { apiRequest } from "./request";
+import { onSessionExpired } from "./sessionExpiry";
 
 describe("apiRequest", () => {
   it("returns response data and tags the request with an id", async () => {
@@ -45,12 +46,12 @@ describe("apiRequest", () => {
     mockHttp({ status: 401, data: { code: "UNAUTHENTICATED", message: "请先登录。" } });
     let expired = 0;
     const onExpired = () => (expired += 1);
-    window.addEventListener("app:session-expired", onExpired);
+    const unsubscribe = onSessionExpired(onExpired);
 
     await expect(apiRequest({ url: "/api/session" })).rejects.toMatchObject({
       status: 401,
     });
-    window.removeEventListener("app:session-expired", onExpired);
+    unsubscribe();
 
     expect(expired).toBe(1);
   });
