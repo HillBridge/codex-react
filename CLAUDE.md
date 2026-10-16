@@ -1,5 +1,30 @@
 # 项目约定
 
+## 目录架构：Feature-Sliced Design（FSD）
+
+后续开发统一遵循 FSD。层级自上而下，**只能依赖更低的层**：
+
+`app` → `pages` → `widgets` → `features` → `entities` → `shared`
+
+| 层 | 放什么 | 现状 |
+|---|---|---|
+| `app` | 入口、路由、全局 Provider、全局样式、`queryClient` | 已有 |
+| `pages` | 一个路由一个切片，只做组装，不写业务逻辑 | 已有 |
+| `widgets` | 由多个 feature/entity 组成的独立界面块 | 暂无，出现复用时再建 |
+| `features` | 有业务价值的用户操作与其数据（如订单列表、登录） | 已有：`orders`、`session` |
+| `entities` | 被多个 feature 共用的业务实体（类型、API、展示） | 暂无，两个 feature 需要同一实体时再建 |
+| `shared` | 与业务无关的通用能力：`api`、`hooks`、`ui` | 已有 |
+
+规则（已由 `eslint.config.js` 强制，违反则 `pnpm lint` 失败）：
+
+- 下层不能引用上层，例如 `shared` 不能引用 `features`。
+- 同一层的切片互不依赖，例如 `features/orders` 不能引用 `features/session`。需要共享时下沉到更低的层。
+- 跨切片只能从公共出口引入：`@/features/orders`，不能写 `@/features/orders/api`。切片内部文件之间用相对路径。
+- 每个切片的 `index.ts` 只导出外部确实要用的成员。
+- 切片内部按职责分段：`api.ts`、`queries.ts`、`mutations.ts`、`queryKeys.ts`、`types.ts`，组件各自一个文件夹。
+- 通用组件放 `shared/ui`，业务配置（列定义、筛选项）留在对应 feature。
+- 集成测试（`*.integration.test.tsx`）允许跨层组装，但仍不能深层引用。
+
 ## React Query 键工厂
 
 每个 feature 的 `queryKeys.ts` 按以下方式写：

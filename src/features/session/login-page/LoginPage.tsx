@@ -4,8 +4,8 @@ import { useNavigate } from "react-router";
 import { Button } from "@/shared/ui/button";
 import { Alert } from "@/shared/ui/alert";
 import { notifySuccess } from "@/shared/ui/toast";
-import { resetQueryCache, sessionQueryKey } from "@/features/session/queries";
-import { login as loginRequest } from "@/features/session/api";
+import { resetQueryCache, sessionQueryKey } from "../queries";
+import { login as loginRequest } from "../api";
 import styles from "./LoginPage.module.css";
 
 export function LoginPage() {

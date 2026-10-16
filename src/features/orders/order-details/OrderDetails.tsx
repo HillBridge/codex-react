@@ -1,8 +1,8 @@
 import { Button } from "@/shared/ui/button";
 import { Alert } from "@/shared/ui/alert";
 import { ApiError } from "@/shared/api/ApiError";
-import { useUpdateOrderStatus } from "@/features/orders/mutations";
-import type { Order } from "@/features/orders/types";
+import { useUpdateOrderStatus } from "../mutations";
+import type { Order } from "../types";
 import styles from "./OrderDetails.module.css";
 
 export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: boolean }) {
