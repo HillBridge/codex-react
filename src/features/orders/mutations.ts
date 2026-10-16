@@ -15,15 +15,7 @@ export function useUpdateOrderStatus() {
       status: OrderStatus;
       version: number;
     }) => updateOrderStatus(input.merchantId, input.orderId, input.status, input.version),
-    onSuccess: (_order, input) => {
-      void queryClient.invalidateQueries({
-        queryKey: orderKeys.merchantLists(input.merchantId),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: orderKeys.detail(input.merchantId, input.orderId),
-      });
-    },
-    onError: (error, input) => {
+    onError: (error) => {
       // 409 冲突由详情页的 Alert 展示；其余失败用 toast。
       if (!(error instanceof ApiError && error.status === 409)) {
         notifyError({
@@ -31,6 +23,9 @@ export function useUpdateOrderStatus() {
           requestId: error instanceof ApiError ? error.requestId : undefined,
         });
       }
+    },
+    // 成功后数据已变，失败（多为 409 版本冲突）说明本地已过期，都需要重新拉取。
+    onSettled: (_order, _error, input) => {
       void queryClient.invalidateQueries({
         queryKey: orderKeys.merchantLists(input.merchantId),
       });

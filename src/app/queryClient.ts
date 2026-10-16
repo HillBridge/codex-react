@@ -3,12 +3,13 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { ApiError } from "@/shared/api/ApiError";
 import { notifyError } from "@/shared/ui/toast";
 
-// 401 已由会话过期机制（emitSessionExpired）跳转登录；meta.silent 表示调用方自行展示错误。
 // 决定一个错误要不要弹 toast
 function notify(error: Error, meta: Record<string, unknown> | undefined) {
+  // meta.silent 表示调用方自行展示错误。
   if (meta?.silent) return;
   if (axios.isCancel(error)) return;
   if (error instanceof ApiError) {
+    // 401 已由会话过期机制（emitSessionExpired）跳转登录。
     if (error.status === 401) return;
     notifyError({ message: error.message, requestId: error.requestId });
     return;
