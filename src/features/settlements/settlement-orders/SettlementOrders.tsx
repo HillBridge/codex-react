@@ -38,6 +38,7 @@ export function SettlementOrders({
       isOpen={settlement !== null}
       title={`结算单 ${settlement?.number ?? ""} 包含的订单`}
       size="wide"
+      showCloseButton
       onClose={onClose}
     >
       {query.isPending ? (

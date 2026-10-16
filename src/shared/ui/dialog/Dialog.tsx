@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  Button,
   Dialog as AriaDialog,
   Heading,
   Modal,
@@ -15,6 +16,8 @@ interface DialogProps {
   size?: "default" | "wide";
   role?: "dialog" | "alertdialog";
   isDismissable?: boolean;
+  // 右上角的关闭按钮，默认不显示。
+  showCloseButton?: boolean;
   children: ReactNode;
 }
 
@@ -25,6 +28,7 @@ export function Dialog({
   size = "default",
   role = "dialog",
   isDismissable = true,
+  showCloseButton = false,
   children,
 }: DialogProps) {
   return (
@@ -42,6 +46,11 @@ export function Dialog({
           .join(" ")}
       >
         <AriaDialog role={role} className={styles.dialog}>
+          {showCloseButton ? (
+            <Button aria-label="关闭" className={styles.close} onPress={onClose}>
+              ×
+            </Button>
+          ) : null}
           <Heading slot="title" className={styles.title}>
             {title}
           </Heading>
