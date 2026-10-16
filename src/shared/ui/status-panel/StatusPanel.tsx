@@ -1,4 +1,4 @@
-import { Button } from "../button";
+import { Button } from "@/shared/ui/button";
 import styles from "./StatusPanel.module.css";
 
 export type StatusKind = "loading" | "empty" | "error" | "forbidden";

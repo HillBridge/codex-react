@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "../../shared/api/ApiError";
-import { notifyError } from "../../shared/ui/toast";
+import { ApiError } from "@/shared/api/ApiError";
+import { notifyError } from "@/shared/ui/toast";
 import { updateOrderStatus } from "./api";
 import { orderKeys } from "./queryKeys";
 import type { OrderStatus } from "./types";

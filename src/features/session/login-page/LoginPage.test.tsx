@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router";
 import { describe, expect, it } from "vitest";
-import { mockHttp } from "../../../test/mockHttp";
+import { mockHttp } from "@/test/mockHttp";
 import { LoginPage } from "./LoginPage";
 
 function LocationProbe() {

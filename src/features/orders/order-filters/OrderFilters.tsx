@@ -11,7 +11,7 @@ import {
   Label,
 } from "react-aria-components";
 import { useSearchParams } from "react-router";
-import { parseOrderFilters } from "../types";
+import { parseOrderFilters } from "@/features/orders/types";
 import styles from "./OrderFilters.module.css";
 
 export function OrderFilters() {

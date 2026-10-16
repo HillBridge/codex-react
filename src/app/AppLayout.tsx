@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet } from "react-router";
 import { useNavigate } from "react-router";
-import { logout, resetQueryCache, useSession } from "../features/session";
-import { Button } from "../shared/ui/button";
-import { StatusPanel } from "../shared/ui/status-panel";
-import { notifySuccess } from "../shared/ui/toast";
+import { logout, resetQueryCache, useSession } from "@/features/session";
+import { Button } from "@/shared/ui/button";
+import { StatusPanel } from "@/shared/ui/status-panel";
+import { notifySuccess } from "@/shared/ui/toast";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {

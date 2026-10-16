@@ -1,4 +1,4 @@
-import { apiRequest } from "../../shared/api/request";
+import { apiRequest } from "@/shared/api/request";
 import type { Order, OrderFilters, OrderListResponse, OrderStatus } from "./types";
 
 export function getOrders(

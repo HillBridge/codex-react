@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
-import { mockHttp, type MockReply } from "../test/mockHttp";
-import { ToastViewport } from "../shared/ui/toast";
+import { mockHttp, type MockReply } from "@/test/mockHttp";
+import { ToastViewport } from "@/shared/ui/toast";
 import { AppLayout } from "./AppLayout";
 import { createAppQueryClient } from "./queryClient";
 

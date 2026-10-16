@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { describe, expect, it } from "vitest";
-import { mockHttp } from "../../test/mockHttp";
+import { mockHttp } from "@/test/mockHttp";
 import { apiRequest } from "./request";
 import { onSessionExpired } from "./sessionExpiry";
 

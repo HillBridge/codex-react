@@ -2,12 +2,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it, vi } from "vitest";
-import { createAppRoutes } from "../../app/routes";
-import { emitSessionExpired } from "../../shared/api/sessionExpiry";
-import { notifyWarning } from "../../shared/ui/toast";
-import { mockHttp } from "../../test/mockHttp";
+import { createAppRoutes } from "@/app/routes";
+import { emitSessionExpired } from "@/shared/api/sessionExpiry";
+import { notifyWarning } from "@/shared/ui/toast";
+import { mockHttp } from "@/test/mockHttp";
 
-vi.mock("../../shared/ui/toast", () => ({
+vi.mock("@/shared/ui/toast", () => ({
   notifyWarning: vi.fn(),
   notifyError: vi.fn(),
   notifySuccess: vi.fn(),

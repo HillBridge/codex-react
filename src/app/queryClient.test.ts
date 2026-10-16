@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiError } from "../shared/api/ApiError";
-import { notifyError } from "../shared/ui/toast";
+import { ApiError } from "@/shared/api/ApiError";
+import { notifyError } from "@/shared/ui/toast";
 import { createAppQueryClient } from "./queryClient";
 
-vi.mock("../shared/ui/toast", () => ({ notifyError: vi.fn() }));
+vi.mock("@/shared/ui/toast", () => ({ notifyError: vi.fn() }));
 
 beforeEach(() => vi.mocked(notifyError).mockClear());
 

@@ -1,4 +1,4 @@
-import { apiRequest } from "../../shared/api/request";
+import { apiRequest } from "@/shared/api/request";
 import type { Session } from "./types";
 
 export function getSession() {

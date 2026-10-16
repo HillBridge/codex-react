@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router";
-import { useSession } from "../../features/session";
-import { OrderDetails, useOrder } from "../../features/orders";
-import { StatusPanel } from "../../shared/ui/status-panel";
+import { useSession } from "@/features/session";
+import { OrderDetails, useOrder } from "@/features/orders";
+import { StatusPanel } from "@/shared/ui/status-panel";
 
 export function OrderDetailPage() {
   const merchant = useSession().data!.merchant;

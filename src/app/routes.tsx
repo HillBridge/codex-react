@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createBrowserRouter, Navigate, Outlet, type RouteObject } from "react-router";
-import { LoginPage } from "../pages/login-page";
-import { WorkspaceHomePage } from "../pages/workspace-home-page";
-import { useSession, useSessionExpiry } from "../features/session";
-import { ApiError } from "../shared/api/ApiError";
-import { StatusPanel } from "../shared/ui/status-panel";
+import { LoginPage } from "@/pages/login-page";
+import { WorkspaceHomePage } from "@/pages/workspace-home-page";
+import { useSession, useSessionExpiry } from "@/features/session";
+import { ApiError } from "@/shared/api/ApiError";
+import { StatusPanel } from "@/shared/ui/status-panel";
 import { AppLayout, NotFoundPage, RouteErrorPage } from "./AppLayout";
 
 function isUnauthorized(error: unknown) {
@@ -95,13 +95,13 @@ export function createAppRoutes(): RouteObject[] {
             {
               path: "orders",
               lazy: async () => ({
-                Component: (await import("../pages/orders-page")).OrdersPage,
+                Component: (await import("@/pages/orders-page")).OrdersPage,
               }),
             },
             {
               path: "orders/:orderId",
               lazy: async () => ({
-                Component: (await import("../pages/order-detail-page")).OrderDetailPage,
+                Component: (await import("@/pages/order-detail-page")).OrderDetailPage,
               }),
             },
             { path: "*", Component: NotFoundPage },

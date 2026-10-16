@@ -1,6 +1,6 @@
 import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { vi } from "vitest";
-import { http } from "../shared/api/http";
+import { http } from "@/shared/api/http";
 
 const defaultAdapter = http.defaults.adapter;
 

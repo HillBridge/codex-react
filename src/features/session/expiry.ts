@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { onSessionExpired } from "../../shared/api/sessionExpiry";
-import { notifyWarning } from "../../shared/ui/toast";
+import { onSessionExpired } from "@/shared/api/sessionExpiry";
+import { notifyWarning } from "@/shared/ui/toast";
 import { sessionQueryKey } from "./queries";
 
 // 会话过期：清缓存、提示、回登录页。放在受保护区域的守卫里调用一次。
