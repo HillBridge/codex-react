@@ -1,15 +1,6 @@
-export type OrderStatus = "pending" | "confirmed" | "cancelled";
-export type OrderStatusFilter = "all" | OrderStatus;
+import type { Order, OrderStatus } from "@/entities/order";
 
-export interface Order {
-  id: string;
-  merchantId: string;
-  number: string;
-  createdAt: string;
-  amount: number;
-  status: OrderStatus;
-  version: number;
-}
+export type OrderStatusFilter = "all" | OrderStatus;
 
 export interface OrderFilters {
   status: OrderStatusFilter;

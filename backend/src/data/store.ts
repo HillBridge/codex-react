@@ -1,4 +1,11 @@
-import { demoUsers, initialOrders, type DemoOrder, type DemoUser } from "./demo-data";
+import {
+  demoUsers,
+  initialOrders,
+  initialProducts,
+  initialSettlements,
+  type DemoOrder,
+  type DemoUser,
+} from "./demo-data";
 
 const sessions = new Map<string, { user: DemoUser; expiresAt: number }>();
 let orders: DemoOrder[] = structuredClone(initialOrders);
@@ -45,4 +52,18 @@ export function updateOrder(order: DemoOrder, status: DemoOrder["status"]) {
 }
 export function deleteOrder(order: DemoOrder) {
   orders = orders.filter((item) => item !== order);
+}
+
+export function listProducts(merchantId: string) {
+  return initialProducts.filter((product) => product.merchantId === merchantId);
+}
+
+export function listSettlements(merchantId: string) {
+  return initialSettlements.filter((settlement) => settlement.merchantId === merchantId);
+}
+
+export function findSettlement(id: string, merchantId: string) {
+  return initialSettlements.find(
+    (settlement) => settlement.id === id && settlement.merchantId === merchantId,
+  );
 }

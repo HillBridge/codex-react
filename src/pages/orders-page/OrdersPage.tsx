@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useSession } from "@/features/session";
+import type { Order } from "@/entities/order";
 import {
   getOrderColumns,
   orderTableFilterFields,
+  parseOrderFilters,
   useDeleteOrder,
   useOrders,
-  parseOrderFilters,
-  type Order,
 } from "@/features/orders";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";

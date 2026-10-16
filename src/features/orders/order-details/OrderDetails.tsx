@@ -2,7 +2,7 @@ import { Button } from "@/shared/ui/button";
 import { Alert } from "@/shared/ui/alert";
 import { ApiError } from "@/shared/api/ApiError";
 import { useUpdateOrderStatus } from "../mutations";
-import type { Order } from "../types";
+import { formatOrderAmount, formatOrderTime, type Order } from "@/entities/order";
 import styles from "./OrderDetails.module.css";
 
 export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: boolean }) {
@@ -21,9 +21,9 @@ export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: bo
         <dt>订单号</dt>
         <dd>{order.number}</dd>
         <dt>创建时间</dt>
-        <dd>{new Date(order.createdAt).toLocaleString("zh-CN")}</dd>
+        <dd>{formatOrderTime(order.createdAt)}</dd>
         <dt>订单金额</dt>
-        <dd>¥{(order.amount / 100).toFixed(2)}</dd>
+        <dd>{formatOrderAmount(order.amount)}</dd>
         <dt>订单状态</dt>
         <dd>{order.status}</dd>
       </dl>

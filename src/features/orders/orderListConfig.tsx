@@ -2,13 +2,12 @@ import { Link } from "react-router";
 import { Button } from "@/shared/ui/button";
 import { TableActions, type DataTableColumn } from "@/shared/ui/data-table";
 import type { TableFilterField } from "@/shared/ui/table-filter";
-import type { Order, OrderStatus } from "./types";
-
-const statusLabels: Record<OrderStatus, string> = {
-  pending: "待处理",
-  confirmed: "已确认",
-  cancelled: "已取消",
-};
+import {
+  formatOrderAmount,
+  formatOrderTime,
+  orderStatusLabels,
+  type Order,
+} from "@/entities/order";
 
 interface OrderColumnOptions {
   canDelete: boolean;
@@ -23,14 +22,14 @@ export const getOrderColumns = ({
   {
     key: "createdAt",
     header: "创建时间",
-    cell: (order) => new Date(order.createdAt).toLocaleString("zh-CN"),
+    cell: (order) => formatOrderTime(order.createdAt),
   },
   {
     key: "amount",
     header: "金额",
-    cell: (order) => `¥${(order.amount / 100).toFixed(2)}`,
+    cell: (order) => formatOrderAmount(order.amount),
   },
-  { key: "status", header: "状态", cell: (order) => statusLabels[order.status] },
+  { key: "status", header: "状态", cell: (order) => orderStatusLabels[order.status] },
   {
     key: "actions",
     header: "操作",
@@ -65,7 +64,7 @@ export const orderTableFilterFields: TableFilterField[] = [
     label: "订单状态",
     options: [
       { id: "all", label: "全部状态" },
-      ...Object.entries(statusLabels).map(([id, label]) => ({ id, label })),
+      ...Object.entries(orderStatusLabels).map(([id, label]) => ({ id, label })),
     ],
   },
 ];

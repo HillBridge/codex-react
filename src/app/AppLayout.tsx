@@ -34,6 +34,12 @@ export function AppLayout() {
           <Link className={styles.navItem} to="/workspace/orders">
             订单管理
           </Link>
+          <Link className={styles.navItem} to="/workspace/products">
+            商品管理
+          </Link>
+          <Link className={styles.navItem} to="/workspace/settlements">
+            结算管理
+          </Link>
         </nav>
         <span className={styles.environment}>开发环境</span>
       </aside>

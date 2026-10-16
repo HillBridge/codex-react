@@ -104,6 +104,18 @@ export function createAppRoutes(): RouteObject[] {
                 Component: (await import("@/pages/order-detail-page")).OrderDetailPage,
               }),
             },
+            {
+              path: "products",
+              lazy: async () => ({
+                Component: (await import("@/pages/products-page")).ProductsPage,
+              }),
+            },
+            {
+              path: "settlements",
+              lazy: async () => ({
+                Component: (await import("@/pages/settlements-page")).SettlementsPage,
+              }),
+            },
             { path: "*", Component: NotFoundPage },
           ],
         },

@@ -12,10 +12,12 @@
 | `/workspace`（index）        | `WorkspaceHomePage`            | 概览                   |
 | `/workspace/orders`          | `OrdersPage`                   | 订单列表，懒加载       |
 | `/workspace/orders/:orderId` | `OrderDetailPage`              | 订单详情，懒加载       |
+| `/workspace/products`        | `ProductsPage`                 | 商品列表，懒加载       |
+| `/workspace/settlements`     | `SettlementsPage`              | 结算单列表，懒加载     |
 | `/workspace/*`、`*`          | `NotFoundPage`                 | 404                    |
 
 - **嵌套与 Outlet**：`RequireSession` 和 `AppLayout` 都用 `<Outlet />` 标出子路由的渲染位置。切换子页面时，外层的守卫、侧边栏、顶栏保持不动。
-- **懒加载**：订单两个页面用 `lazy` 加 `import()`，进入时才下载对应代码，首屏更小。
+- **懒加载**：订单、商品、结算页面用 `lazy` 加 `import()`，进入时才下载对应代码，首屏更小。
 - **ErrorBoundary**：`/` 和 `/workspace` 挂了 `RouteErrorPage`。页面渲染时抛出未捕获的异常，显示"页面加载失败"，而不是白屏。
 - **createAppRoutes()**：路由表包在函数里导出，测试可以用 `createMemoryRouter` 复用同一份路由。全局 `router`（`createBrowserRouter`）由 `App.tsx` 交给 `RouterProvider`。
 

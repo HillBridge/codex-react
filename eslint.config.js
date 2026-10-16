@@ -30,7 +30,13 @@ const upperLayers = (layer) =>
 
 const fsdBlock = (files, patterns) => ({
   files,
-  rules: { "no-restricted-imports": ["error", { patterns }] },
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      // 没有可限制的目标时（如某层只有一个切片）跳过，空 group 会让 ESLint 报配置错误。
+      { patterns: patterns.filter((pattern) => pattern.group.length > 0) },
+    ],
+  },
 });
 
 const fsdBlocks = [
