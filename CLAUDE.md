@@ -1,5 +1,43 @@
 # 项目约定
 
+## 项目概览
+
+`merchant-admin-foundation`：商户后台（订单、商品、结算、概览），前后端同仓库，TypeScript + pnpm，Node >= 22.12。
+
+```
+浏览器 ──(Vite dev proxy /api)──▶ Koa 后端（内存数据）
+  │
+  └─ React SPA：FSD 分层
+```
+
+- 前端：`src/`，按下文 FSD 分层。
+- 后端：`backend/src/`，Koa 分层：`routes`（auth、orders、products、settlements、overview）、`auth`（session、require-user 中间件）、`lib`（request-id、pagination、errors）、`data`（demo-data + 内存 store）。用 `koa-static` 托管构建产物。数据在内存中，重启即重置，适合演示和 e2e，不是生产持久化方案。
+- 测试：前端和后端测试共用一套 Vitest 配置；e2e 在 `tests/e2e`。
+- 设计文档：`docs/`（路由、UI 规范、各次演进的 spec 与 plan）。
+
+## 技术栈
+
+| 技术                                          | 解决的问题                                                                          |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| React 19                                      | UI 构建                                                                             |
+| React Router 8                                | 客户端路由、路由级错误页、登录守卫（`RequireSession`）                              |
+| TanStack Query 5                              | 服务端状态：缓存、loading/error、失效重取；配合 queryKeys 工厂按前缀批量失效        |
+| axios                                         | HTTP 请求；封装统一错误（`ApiError` 带 requestId）、401 会话过期处理                |
+| react-aria-components                         | 无样式可访问组件基础（Dialog、表格交互等），保证键盘与屏幕阅读器支持                |
+| sonner                                        | Toast 提示                                                                          |
+| CSS Modules + `tokens.css`                    | 样式隔离、设计令牌统一；stylelint-declaration-strict-value 强制使用令牌而非硬编码值 |
+| Vite 8                                        | 开发服务器、打包、`/api` 代理（e2e 通过 `API_PROXY_TARGET` 切换代理目标）           |
+| Koa 3 + @koa/router + bodyparser + static     | 轻量后端，提供 API 并托管前端产物                                                   |
+| tsx                                           | 直接运行 TS 后端，无需编译步骤                                                      |
+| TypeScript 6                                  | 全栈类型安全，`tsc -b` 构建时检查                                                   |
+| ESLint（typescript-eslint、react-hooks）      | 代码质量，并通过规则强制 FSD：禁止反向依赖、同层切片互引、深层引用                  |
+| Prettier / Stylelint                          | 代码与样式格式、规范统一                                                            |
+| Vitest + jsdom + Testing Library + user-event | 前端组件/集成测试与后端路由测试                                                     |
+| Playwright                                    | 全链路 e2e（订单流程、工作区页面）                                                  |
+| Git hooks（`core.hooksPath`）                 | 提交前后自动门禁                                                                    |
+
+状态管理约定：服务端状态交给 React Query，URL 状态（筛选、分页）用 `useUrlParams`，不引入全局状态库。
+
 ## 目录架构：Feature-Sliced Design（FSD）
 
 后续开发统一遵循 FSD。层级自上而下，**只能依赖更低的层**：
