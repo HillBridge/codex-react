@@ -2,9 +2,9 @@ import { useSession } from "@/features/session";
 import { OrderSummary } from "@/widgets/order-summary";
 import { ProductSummary } from "@/widgets/product-summary";
 import { SettlementSummary } from "@/widgets/settlement-summary";
-import styles from "./WorkspaceHomePage.module.css";
+import styles from "./OverviewPage.module.css";
 
-export function WorkspaceHomePage() {
+export function OverviewPage() {
   const merchant = useSession().data!.merchant;
 
   return (

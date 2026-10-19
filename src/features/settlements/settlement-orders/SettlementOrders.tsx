@@ -3,7 +3,7 @@ import {
   formatOrderTime,
   orderStatusLabels,
   type Order,
-} from "@/entities/order";
+} from "@/entries/order";
 import { DataTable, type DataTableColumn } from "@/shared/ui/data-table";
 import { Dialog } from "@/shared/ui/dialog";
 import { StatusPanel } from "@/shared/ui/status-panel";

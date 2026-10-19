@@ -4,8 +4,8 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 // Feature-Sliced Design：层级自上而下依赖，同层切片互不依赖，跨切片只能走公共出口（index.ts）。
-const layers = ["app", "pages", "widgets", "features", "entities", "shared"];
-const sliceLayers = ["pages", "widgets", "features", "entities"];
+const layers = ["app", "pages", "widgets", "features", "entries", "shared"];
+const sliceLayers = ["pages", "widgets", "features", "entries"];
 
 const slicesOf = (layer) =>
   fs.existsSync(`src/${layer}`)
@@ -28,6 +28,16 @@ const upperLayers = (layer) =>
     .slice(0, layers.indexOf(layer))
     .flatMap((upper) => [`@/${upper}`, `@/${upper}/**`]);
 
+// entries 只放业务对象本身（类型、展示规则），不含用户操作和数据请求。
+const layerExtras = {
+  entries: [
+    restrict(
+      ["@tanstack/react-query", "@/shared/api", "@/shared/api/**"],
+      "FSD：entries 只放类型与展示规则，数据请求和 query/mutation 属于 features。",
+    ),
+  ],
+};
+
 const fsdBlock = (files, patterns) => ({
   files,
   rules: {
@@ -46,7 +56,11 @@ const fsdBlocks = [
     .map((layer) =>
       fsdBlock(
         [`src/${layer}/**/*.{ts,tsx}`],
-        [restrict(upperLayers(layer), "FSD：下层不能依赖上层。"), deepImport],
+        [
+          restrict(upperLayers(layer), "FSD：下层不能依赖上层。"),
+          deepImport,
+          ...(layerExtras[layer] ?? []),
+        ],
       ),
     ),
   ...sliceLayers.flatMap((layer) =>
@@ -62,6 +76,7 @@ const fsdBlocks = [
             "FSD：同一层的切片之间不能互相依赖，需要共享时下沉到更低的层。",
           ),
           deepImport,
+          ...(layerExtras[layer] ?? []),
         ],
       ),
     ),

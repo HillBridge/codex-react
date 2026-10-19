@@ -1,4 +1,4 @@
-import type { Order, OrderStatus } from "@/entities/order";
+import type { Order, OrderStatus } from "@/entries/order";
 
 export type OrderStatusFilter = "all" | OrderStatus;
 

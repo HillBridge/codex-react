@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { formatOrderAmount, orderStatusLabels } from "@/entities/order";
+import { formatOrderAmount, orderStatusLabels } from "@/entries/order";
 import { useOverview } from "@/features/overview";
 import { StatCard } from "@/shared/ui/stat-card";
 import { StatusPanel } from "@/shared/ui/status-panel";

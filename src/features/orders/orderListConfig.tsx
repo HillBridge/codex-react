@@ -7,7 +7,7 @@ import {
   formatOrderTime,
   orderStatusLabels,
   type Order,
-} from "@/entities/order";
+} from "@/entries/order";
 
 interface OrderColumnOptions {
   canDelete: boolean;

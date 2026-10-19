@@ -1,5 +1,5 @@
 import { apiRequest } from "@/shared/api/request";
-import type { Order, OrderStatus } from "@/entities/order";
+import type { Order, OrderStatus } from "@/entries/order";
 import type { OrderFilters, OrderListResponse } from "./types";
 
 export function getOrders(

@@ -1,5 +1,5 @@
 import { apiRequest } from "@/shared/api/request";
-import type { Order } from "@/entities/order";
+import type { Order } from "@/entries/order";
 import type { SettlementFilters, SettlementListResponse } from "./types";
 
 export function getSettlements(

@@ -2,7 +2,7 @@ import { Button } from "@/shared/ui/button";
 import { Alert } from "@/shared/ui/alert";
 import { ApiError } from "@/shared/api/ApiError";
 import { useUpdateOrderStatus } from "../mutations";
-import { formatOrderAmount, formatOrderTime, type Order } from "@/entities/order";
+import { formatOrderAmount, formatOrderTime, type Order } from "@/entries/order";
 import styles from "./OrderDetails.module.css";
 
 export function OrderDetails({ order, canUpdate }: { order: Order; canUpdate: boolean }) {

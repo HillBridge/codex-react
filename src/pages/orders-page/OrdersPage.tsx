@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/session";
-import type { Order } from "@/entities/order";
+import type { Order } from "@/entries/order";
 import {
   getOrderColumns,
   orderTableFilterFields,

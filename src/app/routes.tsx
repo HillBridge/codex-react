@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createBrowserRouter, Navigate, Outlet, type RouteObject } from "react-router";
 import { LoginPage } from "@/pages/login-page";
-import { WorkspaceHomePage } from "@/pages/workspace-home-page";
+import { OverviewPage } from "@/pages/overview-page";
 import { useSession, useSessionExpiry } from "@/features/session";
 import { ApiError } from "@/shared/api/ApiError";
 import { StatusPanel } from "@/shared/ui/status-panel";
@@ -90,7 +90,7 @@ export function createAppRoutes(): RouteObject[] {
           children: [
             {
               index: true,
-              Component: WorkspaceHomePage,
+              Component: OverviewPage,
             },
             {
               path: "orders",

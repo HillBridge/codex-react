@@ -4,22 +4,29 @@
 
 后续开发统一遵循 FSD。层级自上而下，**只能依赖更低的层**：
 
-`app` → `pages` → `widgets` → `features` → `entities` → `shared`
+`app` → `pages` → `widgets` → `features` → `entries` → `shared`
 
 | 层 | 放什么 | 现状 |
 |---|---|---|
-| `app` | 入口、路由、全局 Provider、全局样式、`queryClient` | 已有 |
-| `pages` | 一个路由一个切片，只做组装，不写业务逻辑 | 已有 |
-| `widgets` | 由多个 feature/entity 组成、被多个页面复用的独立界面块 | 已有：`order-summary`、`settlement-summary`、`product-summary`，概览页和对应列表页复用 |
-| `features` | 有业务价值的用户操作与其数据（如订单列表、登录） | 已有：`orders`、`products`、`settlements`、`overview`、`session` |
-| `entities` | 被多个 feature 共用的业务模型（类型、展示规则），只放确实被两个以上 feature 用到的部分 | 已有：`order` |
-| `shared` | 与业务无关的通用能力：`api`、`hooks`、`ui` | 已有 |
+| `app` | 应用入口，挂载路由、全局 Provider、全局样式、`queryClient`。无切片，按职责分段 | 已有 |
+| `pages` | 一个路由一个切片，只做 widgets/features 的组装，不写业务逻辑（约定，非技术强制） | 已有 |
+| `widgets` | 自带数据的完整界面块（自己调用 feature 的查询并渲染），同时为 page 之间的复用提供合法落点。**可选层**：出现跨页面复用时才建，只有一个页面用就留在 page 里 | 已有：`order-summary`、`settlement-summary`、`product-summary`，概览页和对应列表页复用 |
+| `features` | 有业务价值的用户操作及其数据：数据层（`api`、`queries`、`mutations`、`queryKeys`）、交互 UI（表格、表单、弹出框）、该操作自己的 `types` | 已有：`orders`、`products`、`settlements`、`overview`、`session` |
+| `entries` | 被两个以上 feature 共用的业务对象本身：只放类型和展示规则（状态文案、格式化、计算），不含用户操作和数据请求 | 已有：`order` |
+| `shared` | 与业务无关的通用能力：通用 UI（不含业务）、`api` 实例封装、全局 `hooks`、`lib` 工具函数。无切片，按职责分段 | 已有：`api`、`hooks`、`lib`、`ui` |
+
+放置判断：
+
+- 函数签名或内部规则带业务类型/业务含义（如 `getOrderStatusLabel`）放 `entries`；只处理 `number`、`string`、`Date` 等通用类型的放 `shared`，不要让业务污染 `shared`。
+- 两个 feature 共用的类型或展示规则下沉到 `entries`；只有一个 feature 用就留在该 feature。
+- 两个页面共用一块带数据的界面，提到 `widgets`（feature 之间不能互相引用，只有 widgets 能同时引用多个 feature）。
 
 规则（已由 `eslint.config.js` 强制，违反则 `pnpm lint` 失败）：
 
 - 下层不能引用上层，例如 `shared` 不能引用 `features`。
 - 同一层的切片互不依赖，例如 `features/orders` 不能引用 `features/session`。需要共享时下沉到更低的层。
 - 跨切片只能从公共出口引入：`@/features/orders`，不能写 `@/features/orders/api`。切片内部文件之间用相对路径。
+- `entries` 不能引用 `@tanstack/react-query` 和 `@/shared/api`（数据请求属于 features）。
 - 每个切片的 `index.ts` 只导出外部确实要用的成员。
 - 切片内部按职责分段：`api.ts`、`queries.ts`、`mutations.ts`、`queryKeys.ts`、`types.ts`，组件各自一个文件夹。
 - 通用组件放 `shared/ui`，业务配置（列定义、筛选项）留在对应 feature。

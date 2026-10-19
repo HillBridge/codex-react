@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@/shared/api/ApiError";
 import { notifyError, notifySuccess } from "@/shared/ui/toast";
 import { deleteOrder, updateOrderStatus } from "./api";
-import type { OrderStatus } from "@/entities/order";
+import type { OrderStatus } from "@/entries/order";
 import { orderKeys } from "./queryKeys";
 
 export function useUpdateOrderStatus() {
