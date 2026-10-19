@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/session";
 import type { Order } from "@/entities/order";
 import {
@@ -8,6 +9,8 @@ import {
   useDeleteOrder,
   useOrders,
 } from "@/features/orders";
+import { overviewKeys } from "@/features/overview";
+import { OrderSummary } from "@/widgets/order-summary";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table";
@@ -20,6 +23,7 @@ export function OrdersPage() {
   const { params, update, setPage, reset } = useUrlParams();
   const filters = parseOrderFilters(params);
   const query = useOrders(merchant.id, filters);
+  const queryClient = useQueryClient();
   const deleteMutation = useDeleteOrder();
   const [deleting, setDeleting] = useState<Order | null>(null);
   const columns = getOrderColumns({
@@ -33,6 +37,10 @@ export function OrdersPage() {
       { merchantId: merchant.id, orderId: deleting.id },
       {
         onSuccess: () => {
+          // 订单概况来自 overview，feature 之间不能互相引用，由页面负责让它失效。
+          void queryClient.invalidateQueries({
+            queryKey: overviewKeys.merchant(merchant.id),
+          });
           // 删掉最后一页唯一的一条后，当前页已不存在，退回新的最后一页。
           const remaining = (query.data?.total ?? 1) - 1;
           const lastPage = Math.max(1, Math.ceil(remaining / filters.pageSize));
@@ -45,6 +53,7 @@ export function OrdersPage() {
 
   return (
     <>
+      <OrderSummary merchantId={merchant.id} showLink={false} columns={5} />
       <TableFilter
         fields={orderTableFilterFields}
         values={{ q: filters.q, status: filters.status }}

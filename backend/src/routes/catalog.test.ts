@@ -138,3 +138,45 @@ describe("settlement routes", () => {
     expect(response.status).toBe(404);
   });
 });
+
+describe("overview route", () => {
+  it("requires a session and blocks another merchant", async () => {
+    expect((await request("/api/merchants/merchant-east/overview")).status).toBe(401);
+    const cookie = await login("admin", "admin123");
+    expect(
+      (await request("/api/merchants/merchant-west/overview", { headers: { cookie } }))
+        .status,
+    ).toBe(403);
+  });
+
+  it("summarizes orders, pending settlements and products and follows order deletion", async () => {
+    const cookie = await login("admin", "admin123");
+    const read = async () =>
+      (
+        await request("/api/merchants/merchant-east/overview", { headers: { cookie } })
+      ).json() as {
+        orders: { total: number; pending: number; confirmed: number; cancelled: number };
+        settlements: { pendingCount: number; pendingAmount: number };
+        products: { onShelf: number; offShelf: number };
+      };
+
+    const before = await read();
+    expect(before.orders.total).toBe(25);
+    expect(
+      before.orders.pending + before.orders.confirmed + before.orders.cancelled,
+    ).toBe(25);
+    expect(before.settlements.pendingCount).toBe(2);
+    expect(before.products.onShelf + before.products.offShelf).toBe(12);
+
+    // order-1010 属于待结算的 settlement-1002，删除后待结算金额应减少。
+    await request("/api/merchants/merchant-east/orders/order-1010", {
+      method: "DELETE",
+      headers: { cookie },
+    });
+    const after = await read();
+    expect(after.orders.total).toBe(24);
+    expect(after.settlements.pendingAmount).toBeLessThan(
+      before.settlements.pendingAmount,
+    );
+  });
+});

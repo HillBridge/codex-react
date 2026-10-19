@@ -8,6 +8,7 @@ import {
   useSettlements,
   type Settlement,
 } from "@/features/settlements";
+import { SettlementSummary } from "@/widgets/settlement-summary";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
 import { DataTable } from "@/shared/ui/data-table";
 import { Pagination } from "@/shared/ui/pagination";
@@ -24,6 +25,7 @@ export function SettlementsPage() {
 
   return (
     <>
+      <SettlementSummary merchantId={merchant.id} showLink={false} />
       <TableFilter
         fields={settlementTableFilterFields}
         values={{ status: filters.status }}

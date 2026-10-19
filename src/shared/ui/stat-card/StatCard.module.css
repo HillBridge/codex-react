@@ -1,0 +1,55 @@
+.card {
+  display: grid;
+
+  /* 卡片被网格拉成等高时，内容从顶部排布，不要被纵向撑开。 */
+  align-content: start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.header {
+  display: flex;
+  min-height: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+
+  /* 默认固定 3 列，不同卡片的数据列保持对齐。 */
+  grid-template-columns: repeat(var(--stat-columns, 3), minmax(0, 1fr));
+  gap: var(--space-4) var(--space-3);
+  margin: 0;
+}
+
+.stat dt {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.stat dd {
+  margin: var(--space-1) 0 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.header a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}

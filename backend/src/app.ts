@@ -7,6 +7,7 @@ import { ApiHttpError, sendApiError } from "./lib/errors";
 import { requestId } from "./lib/request-id";
 import { authRouter } from "./routes/auth";
 import { orderRouter } from "./routes/orders";
+import { overviewRouter } from "./routes/overview";
 import { productRouter } from "./routes/products";
 import { settlementRouter } from "./routes/settlements";
 
@@ -49,6 +50,8 @@ export function createApp(options: CreateAppOptions = {}) {
   app.use(productRouter.allowedMethods());
   app.use(settlementRouter.routes());
   app.use(settlementRouter.allowedMethods());
+  app.use(overviewRouter.routes());
+  app.use(overviewRouter.allowedMethods());
 
   app.use(async (ctx, next) => {
     if (!ctx.path.startsWith("/api/")) {

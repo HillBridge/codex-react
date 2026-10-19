@@ -5,6 +5,7 @@ import {
   productTableFilterFields,
   useProducts,
 } from "@/features/products";
+import { ProductSummary } from "@/widgets/product-summary";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
 import { DataTable } from "@/shared/ui/data-table";
 import { Pagination } from "@/shared/ui/pagination";
@@ -19,6 +20,7 @@ export function ProductsPage() {
 
   return (
     <>
+      <ProductSummary merchantId={merchant.id} showLink={false} />
       <TableFilter
         fields={productTableFilterFields}
         values={{ q: filters.q, status: filters.status }}

@@ -1,19 +1,10 @@
 import Router from "@koa/router";
 import { requireMerchantUser } from "../auth/require-user";
-import { findOrder, findSettlement, listSettlements } from "../data/store";
-import type { DemoSettlement } from "../data/demo-data";
+import { findSettlement, listSettlementOrders, listSettlements } from "../data/store";
 import { ApiHttpError } from "../lib/errors";
 import { boundedInteger } from "../lib/pagination";
 
 export const settlementRouter = new Router({ prefix: "/api/merchants/:merchantId" });
-
-// 结算包含的订单可能已被删除，金额与订单数按仍存在的订单实时汇总。
-function includedOrders(settlement: DemoSettlement) {
-  return settlement.orderIds.flatMap((orderId) => {
-    const order = findOrder(orderId, settlement.merchantId);
-    return order ? [order] : [];
-  });
-}
 
 settlementRouter.get("/settlements", (ctx) => {
   const user = requireMerchantUser(ctx);
@@ -26,7 +17,7 @@ settlementRouter.get("/settlements", (ctx) => {
   );
   ctx.body = {
     items: filtered.slice((page - 1) * pageSize, page * pageSize).map((settlement) => {
-      const orders = includedOrders(settlement);
+      const orders = listSettlementOrders(settlement);
       return {
         id: settlement.id,
         number: settlement.number,
@@ -47,5 +38,5 @@ settlementRouter.get("/settlements/:settlementId/orders", (ctx) => {
   const user = requireMerchantUser(ctx);
   const settlement = findSettlement(ctx.params.settlementId, user.merchant.id);
   if (!settlement) throw new ApiHttpError(404, "SETTLEMENT_NOT_FOUND", "结算单不存在。");
-  ctx.body = { items: includedOrders(settlement) };
+  ctx.body = { items: listSettlementOrders(settlement) };
 });

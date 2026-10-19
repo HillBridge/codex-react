@@ -4,6 +4,7 @@ import {
   initialProducts,
   initialSettlements,
   type DemoOrder,
+  type DemoSettlement,
   type DemoUser,
 } from "./demo-data";
 
@@ -66,4 +67,12 @@ export function findSettlement(id: string, merchantId: string) {
   return initialSettlements.find(
     (settlement) => settlement.id === id && settlement.merchantId === merchantId,
   );
+}
+
+// 结算包含的订单可能已被删除，按仍存在的订单实时汇总。
+export function listSettlementOrders(settlement: DemoSettlement) {
+  return settlement.orderIds.flatMap((orderId) => {
+    const order = findOrder(orderId, settlement.merchantId);
+    return order ? [order] : [];
+  });
 }

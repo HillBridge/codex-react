@@ -10,9 +10,9 @@
 |---|---|---|
 | `app` | 入口、路由、全局 Provider、全局样式、`queryClient` | 已有 |
 | `pages` | 一个路由一个切片，只做组装，不写业务逻辑 | 已有 |
-| `widgets` | 由多个 feature/entity 组成的独立界面块 | 暂无，出现复用时再建 |
-| `features` | 有业务价值的用户操作与其数据（如订单列表、登录） | 已有：`orders`、`session` |
-| `entities` | 被多个 feature 共用的业务实体（类型、API、展示） | 暂无，两个 feature 需要同一实体时再建 |
+| `widgets` | 由多个 feature/entity 组成、被多个页面复用的独立界面块 | 已有：`order-summary`、`settlement-summary`、`product-summary`，概览页和对应列表页复用 |
+| `features` | 有业务价值的用户操作与其数据（如订单列表、登录） | 已有：`orders`、`products`、`settlements`、`overview`、`session` |
+| `entities` | 被多个 feature 共用的业务模型（类型、展示规则），只放确实被两个以上 feature 用到的部分 | 已有：`order` |
 | `shared` | 与业务无关的通用能力：`api`、`hooks`、`ui` | 已有 |
 
 规则（已由 `eslint.config.js` 强制，违反则 `pnpm lint` 失败）：
@@ -23,6 +23,8 @@
 - 每个切片的 `index.ts` 只导出外部确实要用的成员。
 - 切片内部按职责分段：`api.ts`、`queries.ts`、`mutations.ts`、`queryKeys.ts`、`types.ts`，组件各自一个文件夹。
 - 通用组件放 `shared/ui`，业务配置（列定义、筛选项）留在对应 feature。
+- feature 之间不能互相引用，所以跨 feature 的联动由上层负责：例如删除订单后让概览缓存失效，写在 `OrdersPage`（页面）里。
+- 测试文件放在所属切片内，不要放在层的根目录。
 - 集成测试（`*.integration.test.tsx`）允许跨层组装，但仍不能深层引用。
 
 ## React Query 键工厂
