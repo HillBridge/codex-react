@@ -1,0 +1,5 @@
+#!/bin/sh
+# 推送前验证：端到端测试（较慢，所以不放在 pre-commit）。失败则中止推送。
+set -e
+echo "pre-push: running e2e tests..."
+pnpm test:e2e

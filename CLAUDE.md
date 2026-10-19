@@ -6,14 +6,14 @@
 
 `app` → `pages` → `widgets` → `features` → `entries` → `shared`
 
-| 层 | 放什么 | 现状 |
-|---|---|---|
-| `app` | 应用入口，挂载路由、全局 Provider、全局样式、`queryClient`。无切片，按职责分段 | 已有 |
-| `pages` | 一个路由一个切片，只做 widgets/features 的组装，不写业务逻辑（约定，非技术强制） | 已有 |
-| `widgets` | 自带数据的完整界面块（自己调用 feature 的查询并渲染），同时为 page 之间的复用提供合法落点。**可选层**：出现跨页面复用时才建，只有一个页面用就留在 page 里 | 已有：`order-summary`、`settlement-summary`、`product-summary`，概览页和对应列表页复用 |
-| `features` | 有业务价值的用户操作及其数据：数据层（`api`、`queries`、`mutations`、`queryKeys`）、交互 UI（表格、表单、弹出框）、该操作自己的 `types` | 已有：`orders`、`products`、`settlements`、`overview`、`session` |
-| `entries` | 被两个以上 feature 共用的业务对象本身：只放类型和展示规则（状态文案、格式化、计算），不含用户操作和数据请求 | 已有：`order` |
-| `shared` | 与业务无关的通用能力：通用 UI（不含业务）、`api` 实例封装、全局 `hooks`、`lib` 工具函数。无切片，按职责分段 | 已有：`api`、`hooks`、`lib`、`ui` |
+| 层         | 放什么                                                                                                                                                    | 现状                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `app`      | 应用入口，挂载路由、全局 Provider、全局样式、`queryClient`。无切片，按职责分段                                                                            | 已有                                                                                   |
+| `pages`    | 一个路由一个切片，只做 widgets/features 的组装，不写业务逻辑（约定，非技术强制）                                                                          | 已有                                                                                   |
+| `widgets`  | 自带数据的完整界面块（自己调用 feature 的查询并渲染），同时为 page 之间的复用提供合法落点。**可选层**：出现跨页面复用时才建，只有一个页面用就留在 page 里 | 已有：`order-summary`、`settlement-summary`、`product-summary`，概览页和对应列表页复用 |
+| `features` | 有业务价值的用户操作及其数据：数据层（`api`、`queries`、`mutations`、`queryKeys`）、交互 UI（表格、表单、弹出框）、该操作自己的 `types`                   | 已有：`orders`、`products`、`settlements`、`overview`、`session`                       |
+| `entries`  | 两个以上 feature 共用的业务对象本身：只放类型和展示规则（状态文案、格式化、计算），不含用户操作和数据请求                                                 | 已有：`order`                                                                          |
+| `shared`   | 与业务无关的通用能力：通用 UI（不含业务）、`api` 实例封装、全局 `hooks`、`lib` 工具函数。无切片，按职责分段                                               | 已有：`api`、`hooks`、`lib`、`ui`                                                      |
 
 放置判断：
 
@@ -49,3 +49,5 @@
 ## 提交前验证
 
 提交前钩子（`.githooks/pre-commit`）会依次执行 format:check、lint:styles、typecheck、lint、test，失败则不能提交。
+
+推送前钩子（`.githooks/pre-push`）会执行 `pnpm test:e2e`（Playwright）。e2e 使用独立端口 3101 的后端并每次新起，不影响开发中的服务；因为较慢，所以不放在提交钩子里。

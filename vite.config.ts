@@ -9,7 +9,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://127.0.0.1:3001",
+      // e2e 用独立端口的后端，避免复用开发中的服务而污染其内存数据。
+      "/api": process.env.API_PROXY_TARGET ?? "http://127.0.0.1:3001",
     },
   },
   test: {
