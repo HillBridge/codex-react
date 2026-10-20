@@ -9,6 +9,7 @@
 }
 
 .field input[type="text"],
+.field input[type="password"],
 .field input:not([type]) {
   min-height: var(--control-height);
   padding: 0.25rem 0.75rem;

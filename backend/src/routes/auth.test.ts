@@ -147,7 +147,23 @@ describe("authentication routes", () => {
   it("rejects incomplete and invalid credentials", async () => {
     const missing = await request("/api/auth/login", json({}, { method: "POST" }));
     expect(missing.status).toBe(400);
-    await expect(missing.json()).resolves.toMatchObject({ code: "INVALID_CREDENTIALS" });
+    await expect(missing.json()).resolves.toMatchObject({
+      code: "INVALID_CREDENTIALS",
+      message: "请输入用户名",
+    });
+
+    const noPassword = await request(
+      "/api/auth/login",
+      json({ username: "admin" }, { method: "POST" }),
+    );
+    await expect(noPassword.json()).resolves.toMatchObject({ message: "请输入密码" });
+
+    // 用户名首尾空格会被去掉。
+    const padded = await request(
+      "/api/auth/login",
+      json({ username: " admin ", password: "admin123" }, { method: "POST" }),
+    );
+    expect(padded.status).toBe(200);
 
     const invalid = await request(
       "/api/auth/login",

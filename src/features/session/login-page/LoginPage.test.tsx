@@ -57,4 +57,84 @@ describe("LoginPage", () => {
     );
     expect(await screen.findByText("/workspace")).toBeInTheDocument();
   });
+
+  function renderLogin() {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <LoginPage />
+          <LocationProbe />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    return userEvent.setup();
+  }
+
+  it("masks the password and lets the password manager fill both fields", () => {
+    renderLogin();
+
+    expect(screen.getByLabelText("密码")).toHaveAttribute("type", "password");
+    expect(screen.getByLabelText("密码")).toHaveAttribute(
+      "autocomplete",
+      "current-password",
+    );
+    expect(screen.getByRole("textbox", { name: "用户名" })).toHaveAttribute(
+      "autocomplete",
+      "username",
+    );
+  });
+
+  it("shows field errors and does not call the API when fields are empty", async () => {
+    const adapter = mockHttp({ data: {} });
+    const user = renderLogin();
+    await user.clear(screen.getByRole("textbox", { name: "用户名" }));
+    await user.clear(screen.getByLabelText("密码"));
+    await user.click(screen.getByRole("button", { name: "登录" }));
+
+    expect(await screen.findByText("请输入用户名")).toBeInTheDocument();
+    expect(screen.getByText("请输入密码")).toBeInTheDocument();
+    expect(adapter).not.toHaveBeenCalled();
+  });
+
+  it("trims the username before submitting", async () => {
+    const adapter = mockHttp({
+      data: {
+        user: { id: "user-admin", name: "运营管理员" },
+        merchant: {
+          id: "merchant-east",
+          name: "东区旗舰店",
+          permissions: ["order:read"],
+        },
+      },
+    });
+    const user = renderLogin();
+    await user.type(screen.getByRole("textbox", { name: "用户名" }), "  ");
+    await user.click(screen.getByRole("button", { name: "登录" }));
+
+    await waitFor(() =>
+      expect(adapter).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: JSON.stringify({ username: "admin", password: "admin123" }),
+        }),
+      ),
+    );
+  });
+
+  it("shows the server's reason inline and allows retrying", async () => {
+    const adapter = mockHttp({
+      status: 401,
+      data: { code: "INVALID_CREDENTIALS", message: "用户名或密码错误。" },
+    });
+    const user = renderLogin();
+    await user.click(screen.getByRole("button", { name: "登录" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("用户名或密码错误。");
+    expect(screen.getByRole("button", { name: "登录" })).toBeEnabled();
+
+    await user.click(screen.getByRole("button", { name: "登录" }));
+    await waitFor(() => expect(adapter).toHaveBeenCalledTimes(2));
+  });
 });

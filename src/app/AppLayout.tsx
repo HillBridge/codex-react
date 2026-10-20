@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, Outlet } from "react-router";
+import { Link, NavLink, Outlet } from "react-router";
 import { useNavigate } from "react-router";
 import { logout, resetQueryCache, useSession } from "@/features/session";
 import { Button } from "@/shared/ui/button";
@@ -28,18 +28,19 @@ export function AppLayout() {
           商户工作台
         </Link>
         <nav aria-label="业务导航">
-          <Link className={styles.navItem} to="/workspace">
+          {/* NavLink 在当前路径匹配时自动设置 aria-current="page"，样式据此高亮。 */}
+          <NavLink className={styles.navItem} to="/workspace" end>
             概览
-          </Link>
-          <Link className={styles.navItem} to="/workspace/orders">
+          </NavLink>
+          <NavLink className={styles.navItem} to="/workspace/orders">
             订单管理
-          </Link>
-          <Link className={styles.navItem} to="/workspace/products">
+          </NavLink>
+          <NavLink className={styles.navItem} to="/workspace/products">
             商品管理
-          </Link>
-          <Link className={styles.navItem} to="/workspace/settlements">
+          </NavLink>
+          <NavLink className={styles.navItem} to="/workspace/settlements">
             结算管理
-          </Link>
+          </NavLink>
         </nav>
         <span className={styles.environment}>开发环境</span>
       </aside>

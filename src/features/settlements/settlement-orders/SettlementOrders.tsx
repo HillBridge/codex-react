@@ -33,9 +33,11 @@ export function SettlementOrders({
   onClose,
 }: SettlementOrdersProps) {
   const query = useSettlementOrders(merchantId, settlement?.id ?? null);
+
   return (
     <Dialog
       isOpen={settlement !== null}
+      isLoading={query.isPending}
       title={`结算单 ${settlement?.number ?? ""} 包含的订单`}
       size="wide"
       showCloseButton

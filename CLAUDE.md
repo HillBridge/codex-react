@@ -12,7 +12,7 @@
 
 - 前端：`src/`，按下文 FSD 分层。
 - 后端：`backend/src/`，Koa 分层：`routes`（auth、orders、products、settlements、overview）、`auth`（session、require-user 中间件）、`lib`（request-id、pagination、errors）、`data`（demo-data + 内存 store）。用 `koa-static` 托管构建产物。数据在内存中，重启即重置，适合演示和 e2e，不是生产持久化方案。
-- 契约：`contracts/` 放前后端共用的 zod 校验规则（目前有 `product.ts`），是规则的唯一来源。前端用别名 `@contracts/*` 引入，后端用相对路径。
+- 契约：`contracts/` 放前后端共用的 zod 校验规则（目前有 `product.ts`、`auth.ts`），是规则的唯一来源。前端用别名 `@contracts/*` 引入，后端用相对路径。
 - 测试：前端和后端测试共用一套 Vitest 配置（含 `contracts/`）；e2e 在 `tests/e2e`。
 - 设计文档：`docs/`（路由、UI 规范、各次演进的 spec 与 plan）。
 

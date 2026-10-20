@@ -12,7 +12,7 @@ function LocationProbe() {
   return <output>{useLocation().pathname}</output>;
 }
 
-function renderWorkspace(reply: MockReply) {
+function renderWorkspace(reply: MockReply, initialPath = "/workspace") {
   const adapter = mockHttp(reply);
   const queryClient = createAppQueryClient();
   queryClient.setQueryData(["session"], {
@@ -29,7 +29,12 @@ function renderWorkspace(reply: MockReply) {
       {
         path: "/workspace",
         element: <AppLayout />,
-        children: [{ index: true, element: <LocationProbe /> }],
+        children: [
+          { index: true, element: <LocationProbe /> },
+          { path: "orders", element: <LocationProbe /> },
+          { path: "orders/:orderId", element: <LocationProbe /> },
+          { path: "products", element: <LocationProbe /> },
+        ],
       },
       {
         path: "/login",
@@ -41,7 +46,7 @@ function renderWorkspace(reply: MockReply) {
         ),
       },
     ],
-    { initialEntries: ["/workspace"] },
+    { initialEntries: [initialPath] },
   );
 
   render(
@@ -78,5 +83,33 @@ describe("AppLayout logout", () => {
 
     expect((await screen.findAllByText("服务暂时不可用")).length).toBeGreaterThan(0);
     expect(screen.getByText("/workspace")).toBeInTheDocument();
+  });
+});
+
+describe("AppLayout navigation highlight", () => {
+  const current = () =>
+    screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page")
+      .map((link) => link.textContent);
+
+  it("highlights only the overview on the workspace home", () => {
+    renderWorkspace({ status: 204 }, "/workspace");
+
+    expect(current()).toEqual(["概览"]);
+  });
+
+  it("highlights the section for the current page and keeps it on nested routes", () => {
+    renderWorkspace({ status: 204 }, "/workspace/orders/order-1001");
+
+    expect(current()).toEqual(["订单管理"]);
+  });
+
+  it("moves the highlight when navigating to another section", async () => {
+    renderWorkspace({ status: 204 }, "/workspace/orders");
+    expect(current()).toEqual(["订单管理"]);
+
+    await userEvent.setup().click(screen.getByRole("link", { name: "商品管理" }));
+    expect(current()).toEqual(["商品管理"]);
   });
 });

@@ -1,4 +1,5 @@
 import Router from "@koa/router";
+import { loginSchema } from "../../../contracts/auth";
 import { createSession, clearSession } from "../auth/session";
 import { findUser } from "../data/store";
 import { ApiHttpError } from "../lib/errors";
@@ -14,17 +15,11 @@ function sessionResponse(user: ReturnType<typeof requireUser>) {
 export const authRouter = new Router({ prefix: "/api" });
 
 authRouter.post("/auth/login", (ctx) => {
-  const body = ctx.request.body as { username?: unknown; password?: unknown };
-  if (
-    typeof body?.username !== "string" ||
-    !body.username.trim() ||
-    typeof body.password !== "string" ||
-    !body.password
-  ) {
-    throw new ApiHttpError(400, "INVALID_CREDENTIALS", "请输入用户名和密码。");
-  }
+  const parsed = loginSchema.safeParse(ctx.request.body ?? {});
+  if (!parsed.success)
+    throw new ApiHttpError(400, "INVALID_CREDENTIALS", parsed.error.issues[0].message);
 
-  const user = findUser(body.username, body.password);
+  const user = findUser(parsed.data.username, parsed.data.password);
   if (!user) throw new ApiHttpError(401, "INVALID_CREDENTIALS", "用户名或密码错误。");
 
   createSession(ctx, user);

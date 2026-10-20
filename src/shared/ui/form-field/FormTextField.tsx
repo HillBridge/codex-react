@@ -13,6 +13,9 @@ interface FormTextFieldProps<T extends FieldValues, TOut> {
   label: string;
   placeholder?: string;
   inputMode?: "decimal" | "numeric";
+  type?: "text" | "password";
+  // 默认关闭浏览器的输入历史；登录等需要密码管理器的字段显式传 username / current-password。
+  autoComplete?: string;
   autoFocus?: boolean;
   // 输入时过滤掉不可能合法的字符。
   sanitize?: (value: string) => string;
@@ -27,6 +30,8 @@ export function FormTextField<T extends FieldValues, TOut = T>({
   label,
   placeholder,
   inputMode,
+  type,
+  autoComplete = "off",
   autoFocus,
   sanitize,
   shouldSkipBlur,
@@ -47,7 +52,8 @@ export function FormTextField<T extends FieldValues, TOut = T>({
       inputMode={inputMode}
       isInvalid={Boolean(message)}
       isDisabled={disabled}
-      autoComplete="off"
+      type={type}
+      autoComplete={autoComplete}
     >
       <Label>{label}</Label>
       <Input ref={ref} placeholder={placeholder} autoFocus={autoFocus} />
