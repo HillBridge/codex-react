@@ -13,15 +13,16 @@
     "start": "tsx backend/src/server.ts",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit --pretty false",
+    "check:deprecated": "node scripts/check-deprecated.mjs",
     "lint": "eslint . --max-warnings 0",
     "lint:styles": "stylelint \"src/**/*.css\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"*.{ts,js,mjs,json,html}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"*.{ts,js,mjs,json,html}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
     "prepare": "git config core.hooksPath .githooks",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "pnpm format:check && pnpm lint:styles && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm lint:styles && pnpm typecheck && pnpm check:deprecated && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
     "@koa/router": "^15.7.0",

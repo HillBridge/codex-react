@@ -166,6 +166,42 @@ test.describe("订单管理", () => {
 });
 
 test.describe("商品管理", () => {
+  test("新建商品：校验、SKU 重复提示，创建后出现在列表", async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.getByRole("link", { name: "商品管理" }).click();
+    await page.getByRole("button", { name: "新建" }).click();
+
+    const dialog = page.getByRole("dialog", { name: "新建商品" });
+    await dialog.getByRole("button", { name: "创建" }).click();
+    await expect(dialog.getByText("请输入商品名称")).toBeVisible();
+
+    // SKU 重复由后端判定，弹出框保持打开并标在 SKU 上。
+    await dialog.getByRole("textbox", { name: "SKU" }).fill("SKU-E0001");
+    await dialog.getByRole("textbox", { name: "商品名称" }).fill("重复商品");
+    await dialog.getByRole("textbox", { name: "价格（元）" }).fill("9.9");
+    await dialog.getByRole("textbox", { name: "库存" }).fill("3");
+    await dialog.getByRole("button", { name: "创建" }).click();
+    await expect(dialog.getByText("该 SKU 已存在")).toBeVisible();
+
+    await dialog.getByRole("textbox", { name: "SKU" }).fill("SKU-E2E-NEW");
+    await dialog.getByRole("textbox", { name: "商品名称" }).fill("端到端新品");
+    await dialog.getByRole("button", { name: "创建" }).click();
+
+    await expect(dialog).toBeHidden();
+    const row = page.getByRole("row", { name: /SKU-E2E-NEW/ });
+    await expect(row).toContainText("端到端新品");
+    await expect(row).toContainText("¥9.90");
+    await expect(row).toContainText("在售");
+  });
+
+  test("没有 product:create 权限的商户看不到新建按钮", async ({ page }) => {
+    await loginAsViewer(page);
+    await page.getByRole("link", { name: "商品管理" }).click();
+
+    await expect(page.getByRole("grid", { name: "商品列表" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "新建" })).toHaveCount(0);
+  });
+
   test("展示商品列表和概况，无链接指向自身", async ({ page }) => {
     await loginAsAdmin(page);
     await page.getByRole("link", { name: "商品管理" }).click();

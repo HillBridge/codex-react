@@ -94,6 +94,11 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks },
     rules: reactHooks.configs.flat.recommended.rules,
   },
+  // 构建脚本运行在 Node 里。
+  {
+    files: ["scripts/**/*.mjs"],
+    languageOptions: { globals: { console: "readonly", process: "readonly" } },
+  },
   ...fsdBlocks,
   // 集成测试需要把真实路由与业务切片组装在一起，允许跨层，但仍禁止深层引用。
   fsdBlock(["src/**/*.integration.test.{ts,tsx}"], [deepImport]),

@@ -4,12 +4,15 @@ import {
   initialProducts,
   initialSettlements,
   type DemoOrder,
+  type DemoProduct,
   type DemoSettlement,
   type DemoUser,
 } from "./demo-data";
 
 const sessions = new Map<string, { user: DemoUser; expiresAt: number }>();
 let orders: DemoOrder[] = structuredClone(initialOrders);
+let products: DemoProduct[] = structuredClone(initialProducts);
+let productSequence = 0;
 
 export function findUser(username: string, password: string) {
   return demoUsers.find(
@@ -38,6 +41,8 @@ export function deleteSession(id: string | undefined) {
 export function resetDemoStore() {
   sessions.clear();
   orders = structuredClone(initialOrders);
+  products = structuredClone(initialProducts);
+  productSequence = 0;
 }
 
 export function findOrder(id: string, merchantId: string) {
@@ -56,7 +61,28 @@ export function deleteOrder(order: DemoOrder) {
 }
 
 export function listProducts(merchantId: string) {
-  return initialProducts.filter((product) => product.merchantId === merchantId);
+  return products.filter((product) => product.merchantId === merchantId);
+}
+
+// SKU 在商户内不区分大小写唯一。
+export function findProductBySku(merchantId: string, sku: string) {
+  const target = sku.toLowerCase();
+  return listProducts(merchantId).find((product) => product.sku.toLowerCase() === target);
+}
+
+// 新商品插在最前面，创建后回到第一页即可看到。
+export function createProduct(
+  merchantId: string,
+  input: Omit<DemoProduct, "id" | "merchantId">,
+) {
+  productSequence += 1;
+  const product: DemoProduct = {
+    id: `product-${3000 + productSequence}`,
+    merchantId,
+    ...input,
+  };
+  products.unshift(product);
+  return product;
 }
 
 export function listSettlements(merchantId: string) {

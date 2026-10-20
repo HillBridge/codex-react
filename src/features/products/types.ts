@@ -11,6 +11,8 @@ export interface Product {
   status: ProductStatus;
 }
 
+export type NewProduct = Omit<Product, "id" | "merchantId">;
+
 export interface ProductFilters {
   status: ProductStatusFilter;
   q: string;

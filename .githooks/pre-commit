@@ -1,9 +1,10 @@
 #!/bin/sh
-# 提交前验证：格式、样式、类型、lint、单测。失败则中止提交。
+# 提交前验证：格式、样式、类型、已弃用 API、lint、单测。失败则中止提交。
 set -e
 echo "pre-commit: running checks..."
 pnpm format:check
 pnpm lint:styles
 pnpm typecheck
+pnpm check:deprecated
 pnpm lint
 pnpm test

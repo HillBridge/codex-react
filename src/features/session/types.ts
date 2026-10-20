@@ -6,6 +6,6 @@ export interface Session {
   merchant: {
     id: string;
     name: string;
-    permissions: ("order:read" | "order:update" | "order:delete")[];
+    permissions: ("order:read" | "order:update" | "order:delete" | "product:create")[];
   };
 }

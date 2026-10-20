@@ -99,6 +99,90 @@ describe("product routes", () => {
   });
 });
 
+describe("product creation", () => {
+  const valid = { sku: "SKU-NEW1", name: "新品", price: 2500, stock: 8, status: "on" };
+  const create = (
+    cookie: string | undefined,
+    body: unknown,
+    merchant = "merchant-east",
+  ) =>
+    request(`/api/merchants/${merchant}/products`, {
+      method: "POST",
+      headers: { ...(cookie ? { cookie } : {}), "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  it("requires a session, the merchant and the product:create permission", async () => {
+    expect((await create(undefined, valid)).status).toBe(401);
+    const admin = await login("admin", "admin123");
+    expect((await create(admin, valid, "merchant-west")).status).toBe(403);
+    const viewer = await login("viewer", "viewer123");
+    const denied = await create(viewer, valid, "merchant-west");
+    expect(denied.status).toBe(403);
+    expect(denied.json()).toMatchObject({ code: "PRODUCT_CREATE_FORBIDDEN" });
+  });
+
+  it("creates a product that is listed first and counted in the overview", async () => {
+    const cookie = await login("admin", "admin123");
+    const created = await create(cookie, { ...valid, sku: " SKU-NEW1 ", name: " 新品 " });
+    expect(created.status).toBe(201);
+    expect(created.json()).toMatchObject({
+      merchantId: "merchant-east",
+      sku: "SKU-NEW1",
+      name: "新品",
+      price: 2500,
+      stock: 8,
+      status: "on",
+    });
+
+    const list = await request("/api/merchants/merchant-east/products", {
+      headers: { cookie },
+    });
+    const body = list.json() as { total: number; items: { sku: string }[] };
+    expect(body.total).toBe(13);
+    expect(body.items[0].sku).toBe("SKU-NEW1");
+
+    // 其他商户不受影响。
+    const west = await login("viewer", "viewer123");
+    const westList = await request("/api/merchants/merchant-west/products", {
+      headers: { cookie: west },
+    });
+    expect(westList.json()).toMatchObject({ total: 1 });
+
+    const overview = await request("/api/merchants/merchant-east/overview", {
+      headers: { cookie },
+    });
+    const { products } = overview.json() as {
+      products: { onShelf: number; offShelf: number };
+    };
+    expect(products.onShelf + products.offShelf).toBe(13);
+  });
+
+  it("rejects a duplicated sku case-insensitively", async () => {
+    const cookie = await login("admin", "admin123");
+    const response = await create(cookie, { ...valid, sku: "sku-e0001" });
+    expect(response.status).toBe(409);
+    expect(response.json()).toMatchObject({ code: "SKU_DUPLICATED" });
+  });
+
+  it.each([
+    ["empty sku", { sku: " " }],
+    ["sku with illegal characters", { sku: "A B" }],
+    ["empty name", { name: "  " }],
+    ["name too long", { name: "x".repeat(51) }],
+    ["fractional price", { price: 10.5 }],
+    ["negative price", { price: -1 }],
+    ["string price", { price: "100" }],
+    ["negative stock", { stock: -1 }],
+    ["unknown status", { status: "draft" }],
+  ])("rejects invalid input: %s", async (_name, patch) => {
+    const cookie = await login("admin", "admin123");
+    const response = await create(cookie, { ...valid, ...patch });
+    expect(response.status).toBe(400);
+    expect(response.json()).toMatchObject({ code: "VALIDATION_ERROR" });
+  });
+});
+
 describe("settlement routes", () => {
   it("summarizes the amount and count from the included orders", async () => {
     const cookie = await login("admin", "admin123");

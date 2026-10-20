@@ -1,5 +1,5 @@
 import { apiRequest } from "@/shared/api/request";
-import type { ProductFilters, ProductListResponse } from "./types";
+import type { NewProduct, Product, ProductFilters, ProductListResponse } from "./types";
 
 export function getProducts(
   merchantId: string,
@@ -15,5 +15,13 @@ export function getProducts(
       pageSize: filters.pageSize,
     },
     signal,
+  });
+}
+
+export function createProduct(merchantId: string, input: NewProduct) {
+  return apiRequest<Product>({
+    url: `/api/merchants/${merchantId}/products`,
+    method: "POST",
+    data: input,
   });
 }
