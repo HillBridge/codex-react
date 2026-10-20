@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
-  Button,
+  Button as AriaButton,
   Input,
   Label,
   ListBox,
@@ -10,6 +10,7 @@ import {
   SelectValue,
   TextField,
 } from "react-aria-components";
+import { Button } from "@/shared/ui/button";
 import styles from "./TableFilter.module.css";
 
 export type TableFilterField =
@@ -34,9 +35,17 @@ interface TableFilterProps {
   // 下拉项选中立即触发；搜索框在回车或点击“查询”时触发。
   onChange: (patch: Record<string, string>) => void;
   onReset: () => void;
+  // 追加在“查询”“重置”之后的自定义操作（如导出），建议使用 shared/ui 的 Button。
+  actions?: ReactNode;
 }
 
-export function TableFilter({ fields, values, onChange, onReset }: TableFilterProps) {
+export function TableFilter({
+  fields,
+  values,
+  onChange,
+  onReset,
+  actions,
+}: TableFilterProps) {
   const searchFields = fields.filter((field) => field.type === "search");
   const initialDrafts = () =>
     Object.fromEntries(searchFields.map((field) => [field.key, values[field.key] ?? ""]));
@@ -71,9 +80,9 @@ export function TableFilter({ fields, values, onChange, onReset }: TableFilterPr
             onSelectionChange={(key) => onChange({ [field.key]: String(key) })}
           >
             <Label>{field.label}</Label>
-            <Button className={styles.select}>
+            <AriaButton className={styles.select}>
               <SelectValue />
-            </Button>
+            </AriaButton>
             <Popover className={styles.popover}>
               <ListBox className={styles.list}>
                 {field.options.map((option) => (
@@ -86,18 +95,18 @@ export function TableFilter({ fields, values, onChange, onReset }: TableFilterPr
           </Select>
         ),
       )}
-      <Button className={styles.action} onPress={submit}>
-        查询
-      </Button>
-      <Button
-        className={styles.action}
-        onPress={() => {
-          setDrafts(Object.fromEntries(searchFields.map((field) => [field.key, ""])));
-          onReset();
-        }}
-      >
-        重置
-      </Button>
+      <div className={styles.actions}>
+        <Button onPress={submit}>查询</Button>
+        <Button
+          onPress={() => {
+            setDrafts(Object.fromEntries(searchFields.map((field) => [field.key, ""])));
+            onReset();
+          }}
+        >
+          重置
+        </Button>
+        {actions}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { Button } from "@/shared/ui/button";
 import { TableFilter, type TableFilterField } from "./TableFilter";
 
 const fields: TableFilterField[] = [
@@ -52,5 +53,27 @@ describe("TableFilter", () => {
     await user.click(screen.getByRole("button", { name: "重置" }));
     expect(onReset).toHaveBeenCalled();
     expect(screen.getByRole("textbox", { name: /搜索关键字/ })).toHaveValue("");
+  });
+
+  it("renders custom actions after the default buttons and keeps them independent", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onDownload = vi.fn();
+    render(
+      <TableFilter
+        fields={fields}
+        values={{ q: "", status: "all" }}
+        onChange={onChange}
+        onReset={vi.fn()}
+        actions={<Button onPress={onDownload}>下载</Button>}
+      />,
+    );
+
+    const names = screen.getAllByRole("button").map((button) => button.textContent);
+    expect(names.slice(-3)).toEqual(["查询", "重置", "下载"]);
+
+    await user.click(screen.getByRole("button", { name: "下载" }));
+    expect(onDownload).toHaveBeenCalledOnce();
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

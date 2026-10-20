@@ -1,12 +1,16 @@
 import Router from "@koa/router";
+import type { Context } from "koa";
 import { requireUser } from "../auth/require-user";
 import { deleteOrder, findOrder, listOrders, updateOrder } from "../data/store";
 import { ApiHttpError } from "../lib/errors";
+import { escapeCsvCell } from "../lib/csv";
 import { boundedInteger } from "../lib/pagination";
 
 export const orderRouter = new Router({ prefix: "/api/merchants/:merchantId" });
 
-orderRouter.get("/orders", (ctx) => {
+const statusLabels = { pending: "待处理", confirmed: "已确认", cancelled: "已取消" };
+
+function filterOrders(ctx: Context) {
   const user = requireUser(ctx);
   if (ctx.params.merchantId !== user.merchant.id)
     throw new ApiHttpError(403, "MERCHANT_FORBIDDEN", "无权访问该商户。");
@@ -19,19 +23,40 @@ orderRouter.get("/orders", (ctx) => {
   const query = String(ctx.query.q ?? "")
     .trim()
     .toLowerCase();
-  const page = boundedInteger(ctx.query.page, 1);
-  const pageSize = boundedInteger(ctx.query.pageSize, 20, 100);
-  const filtered = listOrders(user.merchant.id).filter(
+  return listOrders(user.merchant.id).filter(
     (order) =>
       (status === "all" || status === order.status) &&
       (!query || order.number.toLowerCase().includes(query) || order.id.includes(query)),
   );
+}
+
+orderRouter.get("/orders", (ctx) => {
+  const filtered = filterOrders(ctx);
+  const page = boundedInteger(ctx.query.page, 1);
+  const pageSize = boundedInteger(ctx.query.pageSize, 20, 100);
   ctx.body = {
     items: filtered.slice((page - 1) * pageSize, page * pageSize),
     total: filtered.length,
     page,
     pageSize,
   };
+});
+
+// 导出符合筛选条件的全部订单（不分页）。必须注册在 /orders/:orderId 之前。
+orderRouter.get("/orders/export", (ctx) => {
+  const rows = filterOrders(ctx).map((order) => [
+    order.number,
+    order.createdAt,
+    (order.amount / 100).toFixed(2),
+    statusLabels[order.status],
+  ]);
+  const csv = [["订单号", "创建时间", "金额(元)", "状态"], ...rows]
+    .map((row) => row.map(escapeCsvCell).join(","))
+    .join("\r\n");
+  ctx.type = "text/csv; charset=utf-8";
+  ctx.set("content-disposition", 'attachment; filename="orders.csv"');
+  // BOM 让 Excel 正确识别 UTF-8 中文。
+  ctx.body = `\ufeff${csv}\r\n`;
 });
 
 orderRouter.get("/orders/:orderId", (ctx) => {

@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@/shared/api/ApiError";
 import { notifyError, notifySuccess } from "@/shared/ui/toast";
-import { deleteOrder, updateOrderStatus } from "./api";
+import { saveBlob } from "@/shared/lib/download";
+import { deleteOrder, exportOrders, updateOrderStatus } from "./api";
+import type { OrderFilters } from "./types";
 import type { OrderStatus } from "@/entries/order";
 import { orderKeys } from "./queryKeys";
 
@@ -51,5 +53,14 @@ export function useDeleteOrder() {
         queryKey: orderKeys.detail(input.merchantId, input.orderId),
       });
     },
+  });
+}
+
+export function useExportOrders() {
+  return useMutation({
+    mutationFn: async (input: { merchantId: string; filters: OrderFilters }) => {
+      saveBlob(await exportOrders(input.merchantId, input.filters), "orders.csv");
+    },
+    onSuccess: () => notifySuccess("订单已导出"),
   });
 }

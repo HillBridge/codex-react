@@ -31,6 +31,7 @@ async function request(path: string, init: RequestInit = {}) {
     status: number;
     headers: Record<string, string | string[] | undefined>;
     json: () => Promise<unknown>;
+    text: () => Promise<string>;
   }>((resolve, reject) => {
     const client = httpRequest(
       {
@@ -48,6 +49,7 @@ async function request(path: string, init: RequestInit = {}) {
             status: response.statusCode ?? 0,
             headers: response.headers,
             json: async () => JSON.parse(Buffer.concat(chunks).toString()),
+            text: async () => Buffer.concat(chunks).toString(),
           }),
         );
       },
@@ -83,6 +85,41 @@ describe("order routes", () => {
         })
       ).status,
     ).toBe(404);
+  });
+
+  it("exports all filtered orders as csv without pagination", async () => {
+    expect((await request("/api/merchants/merchant-east/orders/export")).status).toBe(
+      401,
+    );
+    const admin = await login("admin", "admin123");
+    expect(
+      (
+        await request("/api/merchants/merchant-west/orders/export", {
+          headers: { cookie: admin },
+        })
+      ).status,
+    ).toBe(403);
+
+    const all = await request("/api/merchants/merchant-east/orders/export?pageSize=1", {
+      headers: { cookie: admin },
+    });
+    expect(all.status).toBe(200);
+    expect(all.headers["content-type"]).toContain("text/csv");
+    expect(all.headers["content-disposition"]).toContain("orders.csv");
+    const lines = (await all.text()).trimEnd().split("\r\n");
+    expect(lines[0]).toBe("\ufeff订单号,创建时间,金额(元),状态");
+    const list = await request("/api/merchants/merchant-east/orders?pageSize=100", {
+      headers: { cookie: admin },
+    });
+    expect(lines.length - 1).toBe(((await list.json()) as { total: number }).total);
+
+    const pending = await request(
+      "/api/merchants/merchant-east/orders/export?status=pending",
+      { headers: { cookie: admin } },
+    );
+    const body = await pending.text();
+    expect(body).toContain("待处理");
+    expect(body).not.toContain("已确认");
   });
 
   it("filters a merchant order list and enforces updates with versioning", async () => {

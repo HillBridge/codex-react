@@ -7,11 +7,13 @@ import {
   orderTableFilterFields,
   parseOrderFilters,
   useDeleteOrder,
+  useExportOrders,
   useOrders,
 } from "@/features/orders";
 import { overviewKeys } from "@/features/overview";
 import { OrderSummary } from "@/widgets/order-summary";
 import { useUrlParams } from "@/shared/hooks/useUrlParams";
+import { Button } from "@/shared/ui/button";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table";
 import { TableFilter } from "@/shared/ui/table-filter";
@@ -25,6 +27,7 @@ export function OrdersPage() {
   const query = useOrders(merchant.id, filters);
   const queryClient = useQueryClient();
   const deleteMutation = useDeleteOrder();
+  const exportMutation = useExportOrders();
   const [deleting, setDeleting] = useState<Order | null>(null);
   const columns = getOrderColumns({
     canDelete: merchant.permissions.includes("order:delete"),
@@ -59,6 +62,15 @@ export function OrdersPage() {
         values={{ q: filters.q, status: filters.status }}
         onChange={update}
         onReset={reset}
+        actions={
+          <Button
+            isPending={exportMutation.isPending}
+            isDisabled={exportMutation.isPending}
+            onPress={() => exportMutation.mutate({ merchantId: merchant.id, filters })}
+          >
+            {exportMutation.isPending ? "下载中…" : "下载"}
+          </Button>
+        }
       />
       {query.isPending ? (
         <StatusPanel kind="loading" title="正在加载订单" />

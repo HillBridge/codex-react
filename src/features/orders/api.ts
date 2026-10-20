@@ -19,6 +19,15 @@ export function getOrders(
   });
 }
 
+// 导出符合筛选条件的全部订单，不带分页参数。
+export function exportOrders(merchantId: string, filters: OrderFilters) {
+  return apiRequest<Blob>({
+    url: `/api/merchants/${merchantId}/orders/export`,
+    params: { status: filters.status, q: filters.q },
+    responseType: "blob",
+  });
+}
+
 export function getOrder(merchantId: string, orderId: string, signal?: AbortSignal) {
   return apiRequest<Order>({
     url: `/api/merchants/${merchantId}/orders/${orderId}`,
