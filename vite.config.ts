@@ -5,7 +5,10 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@contracts": fileURLToPath(new URL("./contracts", import.meta.url)),
+    },
   },
   server: {
     proxy: {
@@ -17,7 +20,11 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     clearMocks: true,
-    include: ["src/**/*.test.{ts,tsx}", "backend/src/**/*.test.ts"],
+    include: [
+      "src/**/*.test.{ts,tsx}",
+      "backend/src/**/*.test.ts",
+      "contracts/**/*.test.ts",
+    ],
     exclude: ["tests/e2e/**", "node_modules/**", "dist/**"],
   },
 });

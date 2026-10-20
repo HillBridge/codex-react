@@ -64,10 +64,24 @@ export function listProducts(merchantId: string) {
   return products.filter((product) => product.merchantId === merchantId);
 }
 
+export function findProduct(id: string, merchantId: string) {
+  return products.find(
+    (product) => product.id === id && product.merchantId === merchantId,
+  );
+}
+
 // SKU 在商户内不区分大小写唯一。
 export function findProductBySku(merchantId: string, sku: string) {
   const target = sku.toLowerCase();
   return listProducts(merchantId).find((product) => product.sku.toLowerCase() === target);
+}
+
+export function updateProduct(
+  product: DemoProduct,
+  input: Omit<DemoProduct, "id" | "merchantId">,
+) {
+  Object.assign(product, input);
+  return product;
 }
 
 // 新商品插在最前面，创建后回到第一页即可看到。

@@ -16,8 +16,8 @@
     "check:deprecated": "node scripts/check-deprecated.mjs",
     "lint": "eslint . --max-warnings 0",
     "lint:styles": "stylelint \"src/**/*.css\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"contracts/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"backend/**/*.ts\" \"contracts/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
     "prepare": "git config core.hooksPath .githooks",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -25,6 +25,7 @@
     "check": "pnpm format:check && pnpm lint:styles && pnpm typecheck && pnpm check:deprecated && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
+    "@hookform/resolvers": "^6.0.0",
     "@koa/router": "^15.7.0",
     "@tanstack/react-query": "^5.104.1",
     "axios": "^1.20.0",
@@ -34,9 +35,11 @@
     "react": "^19.3.0",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.0",
+    "react-hook-form": "^7.90.0",
     "react-router": "^8.4.0",
     "sonner": "^2.0.8",
-    "tsx": "^4.23.15"
+    "tsx": "^4.23.15",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

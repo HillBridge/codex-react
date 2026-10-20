@@ -15,8 +15,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "paths": { "@/*": ["./src/*"] },
+    "paths": { "@/*": ["./src/*"], "@contracts/*": ["./contracts/*"] },
     "types": ["node", "vite/client", "vitest/globals"]
   },
-  "include": ["backend/src", "src", "vite.config.ts"]
+  "include": ["backend/src", "contracts", "src", "vite.config.ts"]
 }

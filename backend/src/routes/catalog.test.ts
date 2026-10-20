@@ -183,6 +183,97 @@ describe("product creation", () => {
   });
 });
 
+describe("product update", () => {
+  const patch = { sku: "SKU-E0001", name: "改名", price: 999, stock: 0, status: "off" };
+  const update = (
+    cookie: string | undefined,
+    id: string,
+    body: unknown,
+    merchant = "merchant-east",
+  ) =>
+    request(`/api/merchants/${merchant}/products/${id}`, {
+      method: "PUT",
+      headers: { ...(cookie ? { cookie } : {}), "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  it("requires a session, the merchant and the product:update permission", async () => {
+    expect((await update(undefined, "product-1001", patch)).status).toBe(401);
+    const admin = await login("admin", "admin123");
+    expect((await update(admin, "product-1001", patch, "merchant-west")).status).toBe(
+      403,
+    );
+    const viewer = await login("viewer", "viewer123");
+    const denied = await update(viewer, "product-2001", patch, "merchant-west");
+    expect(denied.status).toBe(403);
+    expect(denied.json()).toMatchObject({ code: "PRODUCT_UPDATE_FORBIDDEN" });
+  });
+
+  it("updates every field in place and is reflected in list and overview", async () => {
+    const cookie = await login("admin", "admin123");
+    const before = await request("/api/merchants/merchant-east/overview", {
+      headers: { cookie },
+    });
+    const beforeProducts = (before.json() as { products: { offShelf: number } }).products;
+
+    const response = await update(cookie, "product-1001", {
+      ...patch,
+      sku: " SKU-RENAMED ",
+    });
+    expect(response.status).toBe(200);
+    expect(response.json()).toEqual({
+      id: "product-1001",
+      merchantId: "merchant-east",
+      sku: "SKU-RENAMED",
+      name: "改名",
+      price: 999,
+      stock: 0,
+      status: "off",
+    });
+
+    const list = await request("/api/merchants/merchant-east/products?q=SKU-RENAMED", {
+      headers: { cookie },
+    });
+    expect(list.json()).toMatchObject({ total: 1 });
+    const overview = await request("/api/merchants/merchant-east/overview", {
+      headers: { cookie },
+    });
+    expect(
+      (overview.json() as { products: { offShelf: number } }).products.offShelf,
+    ).toBe(beforeProducts.offShelf + 1);
+  });
+
+  it("allows keeping its own sku but rejects another product's sku", async () => {
+    const cookie = await login("admin", "admin123");
+    expect((await update(cookie, "product-1001", patch)).status).toBe(200);
+    const duplicated = await update(cookie, "product-1001", {
+      ...patch,
+      sku: "sku-e0002",
+    });
+    expect(duplicated.status).toBe(409);
+    expect(duplicated.json()).toMatchObject({ code: "SKU_DUPLICATED" });
+  });
+
+  it("returns 404 for an unknown product or one of another merchant", async () => {
+    const cookie = await login("admin", "admin123");
+    expect((await update(cookie, "missing", patch)).status).toBe(404);
+    expect((await update(cookie, "product-2001", patch)).status).toBe(404);
+  });
+
+  it("rejects invalid input with 400", async () => {
+    const cookie = await login("admin", "admin123");
+    for (const body of [
+      { ...patch, price: 1.5 },
+      { ...patch, name: " " },
+      { ...patch, status: "x" },
+    ]) {
+      const response = await update(cookie, "product-1001", body);
+      expect(response.status).toBe(400);
+      expect(response.json()).toMatchObject({ code: "VALIDATION_ERROR" });
+    }
+  });
+});
+
 describe("settlement routes", () => {
   it("summarizes the amount and count from the included orders", async () => {
     const cookie = await login("admin", "admin123");

@@ -1,5 +1,5 @@
 export type Permission =
-  "order:read" | "order:update" | "order:delete" | "product:create";
+  "order:read" | "order:update" | "order:delete" | "product:create" | "product:update";
 
 export interface DemoMerchant {
   id: string;
@@ -24,7 +24,13 @@ export const demoUsers: DemoUser[] = [
     merchant: {
       id: "merchant-east",
       name: "东区旗舰店",
-      permissions: ["order:read", "order:update", "order:delete", "product:create"],
+      permissions: [
+        "order:read",
+        "order:update",
+        "order:delete",
+        "product:create",
+        "product:update",
+      ],
     },
   },
   {

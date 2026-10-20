@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/session";
 import {
-  CreateProductDialog,
+  getProductColumns,
   parseProductFilters,
-  productColumns,
+  ProductFormDialog,
   productTableFilterFields,
   useCreateProduct,
   useProducts,
+  useUpdateProduct,
+  type NewProduct,
+  type Product,
 } from "@/features/products";
 import { overviewKeys } from "@/features/overview";
 import { ProductSummary } from "@/widgets/product-summary";
@@ -25,11 +28,37 @@ export function ProductsPage() {
   const query = useProducts(merchant.id, filters);
   const queryClient = useQueryClient();
   const createMutation = useCreateProduct();
-  const [creating, setCreating] = useState(false);
+  const updateMutation = useUpdateProduct();
+  // 弹出框三种状态：关闭、新建、编辑某个商品。
+  const [dialog, setDialog] = useState<{ product?: Product } | null>(null);
+  const canCreate = merchant.permissions.includes("product:create");
+  const columns = getProductColumns({
+    canEdit: merchant.permissions.includes("product:update"),
+    onEdit: (product) => setDialog({ product }),
+  });
 
-  const openCreate = () => {
-    createMutation.reset();
-    setCreating(true);
+  const openCreate = () => setDialog({});
+
+  // 商品概况来自 overview，feature 之间不能互相引用，由页面负责让它失效。
+  const invalidateOverview = () =>
+    void queryClient.invalidateQueries({ queryKey: overviewKeys.merchant(merchant.id) });
+
+  // 失败时 reject，由弹出框就地展示 SKU 重复和校验错误。
+  const submit = async (product: NewProduct) => {
+    const editing = dialog?.product;
+    if (editing) {
+      await updateMutation.mutateAsync({
+        merchantId: merchant.id,
+        productId: editing.id,
+        product,
+      });
+    } else {
+      await createMutation.mutateAsync({ merchantId: merchant.id, product });
+      // 新商品排在最前，回到第一页才能看到。
+      setPage(1);
+    }
+    invalidateOverview();
+    setDialog(null);
   };
 
   return (
@@ -41,7 +70,7 @@ export function ProductsPage() {
         onChange={update}
         onReset={reset}
         actions={
-          merchant.permissions.includes("product:create") ? (
+          canCreate ? (
             <Button variant="primary" onPress={openCreate}>
               新建
             </Button>
@@ -61,7 +90,7 @@ export function ProductsPage() {
         <DataTable
           ariaLabel="商品列表"
           rows={query.data!.items}
-          columns={productColumns}
+          columns={columns}
           getRowId={(product) => product.id}
         />
       ) : (
@@ -75,27 +104,12 @@ export function ProductsPage() {
           onChange={setPage}
         />
       ) : null}
-      <CreateProductDialog
-        isOpen={creating}
-        isPending={createMutation.isPending}
-        error={createMutation.error}
-        onSubmit={(product) =>
-          createMutation.mutate(
-            { merchantId: merchant.id, product },
-            {
-              onSuccess: () => {
-                // 商品概况来自 overview，feature 之间不能互相引用，由页面负责让它失效。
-                void queryClient.invalidateQueries({
-                  queryKey: overviewKeys.merchant(merchant.id),
-                });
-                // 新商品排在最前，回到第一页才能看到。
-                setPage(1);
-                setCreating(false);
-              },
-            },
-          )
-        }
-        onClose={() => setCreating(false)}
+      <ProductFormDialog
+        isOpen={dialog !== null}
+        product={dialog?.product}
+        isPending={createMutation.isPending || updateMutation.isPending}
+        onSubmit={submit}
+        onClose={() => setDialog(null)}
       />
     </>
   );

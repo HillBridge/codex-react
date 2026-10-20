@@ -12,29 +12,32 @@
 
 - 前端：`src/`，按下文 FSD 分层。
 - 后端：`backend/src/`，Koa 分层：`routes`（auth、orders、products、settlements、overview）、`auth`（session、require-user 中间件）、`lib`（request-id、pagination、errors）、`data`（demo-data + 内存 store）。用 `koa-static` 托管构建产物。数据在内存中，重启即重置，适合演示和 e2e，不是生产持久化方案。
-- 测试：前端和后端测试共用一套 Vitest 配置；e2e 在 `tests/e2e`。
+- 契约：`contracts/` 放前后端共用的 zod 校验规则（目前有 `product.ts`），是规则的唯一来源。前端用别名 `@contracts/*` 引入，后端用相对路径。
+- 测试：前端和后端测试共用一套 Vitest 配置（含 `contracts/`）；e2e 在 `tests/e2e`。
 - 设计文档：`docs/`（路由、UI 规范、各次演进的 spec 与 plan）。
 
 ## 技术栈
 
-| 技术                                          | 解决的问题                                                                          |
-| --------------------------------------------- | ----------------------------------------------------------------------------------- |
-| React 19                                      | UI 构建                                                                             |
-| React Router 8                                | 客户端路由、路由级错误页、登录守卫（`RequireSession`）                              |
-| TanStack Query 5                              | 服务端状态：缓存、loading/error、失效重取；配合 queryKeys 工厂按前缀批量失效        |
-| axios                                         | HTTP 请求；封装统一错误（`ApiError` 带 requestId）、401 会话过期处理                |
-| react-aria-components                         | 无样式可访问组件基础（Dialog、表格交互等），保证键盘与屏幕阅读器支持                |
-| sonner                                        | Toast 提示                                                                          |
-| CSS Modules + `tokens.css`                    | 样式隔离、设计令牌统一；stylelint-declaration-strict-value 强制使用令牌而非硬编码值 |
-| Vite 8                                        | 开发服务器、打包、`/api` 代理（e2e 通过 `API_PROXY_TARGET` 切换代理目标）           |
-| Koa 3 + @koa/router + bodyparser + static     | 轻量后端，提供 API 并托管前端产物                                                   |
-| tsx                                           | 直接运行 TS 后端，无需编译步骤                                                      |
-| TypeScript 6                                  | 全栈类型安全，`tsc -b` 构建时检查                                                   |
-| ESLint（typescript-eslint、react-hooks）      | 代码质量，并通过规则强制 FSD：禁止反向依赖、同层切片互引、深层引用                  |
-| Prettier / Stylelint                          | 代码与样式格式、规范统一                                                            |
-| Vitest + jsdom + Testing Library + user-event | 前端组件/集成测试与后端路由测试                                                     |
-| Playwright                                    | 全链路 e2e（订单流程、工作区页面）                                                  |
-| Git hooks（`core.hooksPath`）                 | 提交前后自动门禁                                                                    |
+| 技术                                          | 解决的问题                                                                                              |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| React 19                                      | UI 构建                                                                                                 |
+| React Router 8                                | 客户端路由、路由级错误页、登录守卫（`RequireSession`）                                                  |
+| TanStack Query 5                              | 服务端状态：缓存、loading/error、失效重取；配合 queryKeys 工厂按前缀批量失效                            |
+| axios                                         | HTTP 请求；封装统一错误（`ApiError` 带 requestId）、401 会话过期处理                                    |
+| react-aria-components                         | 无样式可访问组件基础（Dialog、表格交互等），保证键盘与屏幕阅读器支持                                    |
+| sonner                                        | Toast 提示                                                                                              |
+| CSS Modules + `tokens.css`                    | 样式隔离、设计令牌统一；stylelint-declaration-strict-value 强制使用令牌而非硬编码值                     |
+| zod 4                                         | 校验规则的唯一来源：`contracts/` 中的 schema 同时给后端校验请求、给前端表单复用，并推导 TypeScript 类型 |
+| react-hook-form + @hookform/resolvers         | 表单状态（touched、错误、提交中）的标准实现，通过 zodResolver 接入 zod                                  |
+| Vite 8                                        | 开发服务器、打包、`/api` 代理（e2e 通过 `API_PROXY_TARGET` 切换代理目标）                               |
+| Koa 3 + @koa/router + bodyparser + static     | 轻量后端，提供 API 并托管前端产物                                                                       |
+| tsx                                           | 直接运行 TS 后端，无需编译步骤                                                                          |
+| TypeScript 6                                  | 全栈类型安全，`tsc -b` 构建时检查                                                                       |
+| ESLint（typescript-eslint、react-hooks）      | 代码质量，并通过规则强制 FSD：禁止反向依赖、同层切片互引、深层引用                                      |
+| Prettier / Stylelint                          | 代码与样式格式、规范统一                                                                                |
+| Vitest + jsdom + Testing Library + user-event | 前端组件/集成测试与后端路由测试                                                                         |
+| Playwright                                    | 全链路 e2e（订单流程、工作区页面）                                                                      |
+| Git hooks（`core.hooksPath`）                 | 提交前后自动门禁                                                                                        |
 
 状态管理约定：服务端状态交给 React Query，URL 状态（筛选、分页）用 `useUrlParams`，不引入全局状态库。
 
@@ -89,3 +92,16 @@
 提交前钩子（`.githooks/pre-commit`）会依次执行 format:check、lint:styles、typecheck、check:deprecated、lint、test，失败则不能提交。
 
 推送前钩子（`.githooks/pre-push`）会执行 `pnpm test:e2e`（Playwright）。e2e 使用独立端口 3101 的后端并每次新起，不影响开发中的服务；因为较慢，所以不放在提交钩子里。
+
+## 表单约定
+
+所有表单统一用 react-hook-form + zod，不要手写 touched、错误状态或校验函数。
+
+- **规则只写一份**：接口字段的校验规则写在 `contracts/` 的 zod schema 里。后端用它校验请求，前端表单 schema 复用其中的字段，只在上面加输入形态的转换（如价格元转分、字符串转数字）。不要在前后端各写一遍规则。
+- **表单状态**：`useForm({ resolver: zodResolver(schema), mode: "onTouched" })`，字段失焦后开始校验，之后实时更新。
+- **字段组件**：用 `@/shared/ui/form-field` 的 `FormTextField`、`FormRadioGroup`，它们绑定 `control` 并展示错误；新的字段类型也加在这里。
+- **输入过滤**：只可能非法的字符通过 `sanitize` 在输入时过滤，校验规则仍以 schema 为准。
+- **放弃填写不校验**：表单用 `useAbandonGuard`，点遮罩、标题或带 `data-abandon` 的“取消”按钮引起的失焦不触发校验。
+- **react-aria 的 `Form` 必须设 `validationBehavior="aria"`**，否则字段无效时浏览器原生校验会拦住提交。
+- **服务端错误**：提交函数返回 Promise，失败时 reject；表单内用 `setError` 就地展示（如 SKU 重复标在字段上，通用校验错误用 Alert），其余失败由调用方 toast。
+- 参考实现：`src/features/products/product-form-dialog/ProductFormDialog.tsx`。

@@ -25,3 +25,11 @@ export function createProduct(merchantId: string, input: NewProduct) {
     data: input,
   });
 }
+
+export function updateProduct(merchantId: string, productId: string, input: NewProduct) {
+  return apiRequest<Product>({
+    url: `/api/merchants/${merchantId}/products/${productId}`,
+    method: "PUT",
+    data: input,
+  });
+}

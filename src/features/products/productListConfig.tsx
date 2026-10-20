@@ -1,5 +1,6 @@
+import { Button } from "@/shared/ui/button";
 import { formatCents } from "@/shared/lib/format";
-import type { DataTableColumn } from "@/shared/ui/data-table";
+import { TableActions, type DataTableColumn } from "@/shared/ui/data-table";
 import type { TableFilterField } from "@/shared/ui/table-filter";
 import type { Product, ProductStatus } from "./types";
 
@@ -8,12 +9,39 @@ const statusLabels: Record<ProductStatus, string> = {
   off: "已下架",
 };
 
-export const productColumns: DataTableColumn<Product>[] = [
+interface ProductColumnOptions {
+  canEdit: boolean;
+  onEdit: (product: Product) => void;
+}
+
+export const getProductColumns = ({
+  canEdit,
+  onEdit,
+}: ProductColumnOptions): DataTableColumn<Product>[] => [
   { key: "sku", header: "SKU", isRowHeader: true, cell: (product) => product.sku },
   { key: "name", header: "商品名称", cell: (product) => product.name },
   { key: "price", header: "价格", cell: (product) => formatCents(product.price) },
   { key: "stock", header: "库存", cell: (product) => product.stock },
   { key: "status", header: "状态", cell: (product) => statusLabels[product.status] },
+  ...(canEdit
+    ? [
+        {
+          key: "actions",
+          header: "操作",
+          cell: (product: Product) => (
+            <TableActions>
+              <Button
+                variant="secondary"
+                aria-label={`编辑商品 ${product.sku}`}
+                onPress={() => onEdit(product)}
+              >
+                编辑
+              </Button>
+            </TableActions>
+          ),
+        },
+      ]
+    : []),
 ];
 
 export const productTableFilterFields: TableFilterField[] = [

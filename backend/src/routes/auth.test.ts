@@ -86,7 +86,13 @@ describe("authentication routes", () => {
       merchant: {
         id: "merchant-east",
         name: "东区旗舰店",
-        permissions: ["order:read", "order:update", "order:delete", "product:create"],
+        permissions: [
+          "order:read",
+          "order:update",
+          "order:delete",
+          "product:create",
+          "product:update",
+        ],
       },
     });
   });

@@ -194,12 +194,50 @@ test.describe("商品管理", () => {
     await expect(row).toContainText("在售");
   });
 
+  test("编辑商品：预填原值，修改后列表更新，SKU 与其他商品重复被拒绝", async ({
+    page,
+  }) => {
+    await loginAsAdmin(page);
+    await page.getByRole("link", { name: "商品管理" }).click();
+    // 只动一个专属商品，避免影响并行用例读取的种子数据。
+    await page.getByRole("button", { name: "新建" }).click();
+    let dialog = page.getByRole("dialog", { name: "新建商品" });
+    await dialog.getByRole("textbox", { name: "SKU" }).fill("SKU-E2E-EDIT");
+    await dialog.getByRole("textbox", { name: "商品名称" }).fill("待编辑商品");
+    await dialog.getByRole("textbox", { name: "价格（元）" }).fill("5");
+    await dialog.getByRole("textbox", { name: "库存" }).fill("2");
+    await dialog.getByRole("button", { name: "创建" }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.getByRole("button", { name: "编辑商品 SKU-E2E-EDIT" }).click();
+    dialog = page.getByRole("dialog", { name: "编辑商品" });
+    await expect(dialog.getByRole("textbox", { name: "商品名称" })).toHaveValue(
+      "待编辑商品",
+    );
+    await expect(dialog.getByRole("textbox", { name: "价格（元）" })).toHaveValue("5.00");
+
+    await dialog.getByRole("textbox", { name: "SKU" }).fill("SKU-E0001");
+    await dialog.getByRole("button", { name: "保存" }).click();
+    await expect(dialog.getByText("该 SKU 已存在")).toBeVisible();
+
+    await dialog.getByRole("textbox", { name: "SKU" }).fill("SKU-E2E-EDIT");
+    await dialog.getByRole("textbox", { name: "商品名称" }).fill("已编辑商品");
+    await dialog.getByRole("radio", { name: "已下架" }).check({ force: true });
+    await dialog.getByRole("button", { name: "保存" }).click();
+
+    await expect(dialog).toBeHidden();
+    const row = page.getByRole("row", { name: /SKU-E2E-EDIT/ });
+    await expect(row).toContainText("已编辑商品");
+    await expect(row).toContainText("已下架");
+  });
+
   test("没有 product:create 权限的商户看不到新建按钮", async ({ page }) => {
     await loginAsViewer(page);
     await page.getByRole("link", { name: "商品管理" }).click();
 
     await expect(page.getByRole("grid", { name: "商品列表" })).toBeVisible();
     await expect(page.getByRole("button", { name: "新建" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /编辑商品/ })).toHaveCount(0);
   });
 
   test("展示商品列表和概况，无链接指向自身", async ({ page }) => {
