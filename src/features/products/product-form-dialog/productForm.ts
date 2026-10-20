@@ -6,7 +6,7 @@ import {
   skuSchema,
   stockSchema,
 } from "@contracts/product";
-import type { Product } from "./types";
+import type { Product } from "../types";
 
 // 表单里价格以元输入、库存是字符串；规则复用契约里的字段，转换成接口需要的分和数字。
 export const productFormSchema = z.object({

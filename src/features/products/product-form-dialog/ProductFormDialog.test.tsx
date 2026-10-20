@@ -164,6 +164,37 @@ describe("ProductFormDialog", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("still submits and shows every error when a field is already invalid", async () => {
+    const { onSubmit, user } = setup();
+    // 名称先失焦出错，此时它已处于无效状态；直接点创建，其他字段的错误也要出现。
+    await user.click(screen.getByRole("textbox", { name: "商品名称" }));
+    await user.tab();
+    expect(await screen.findByText("请输入商品名称")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "创建" }));
+
+    for (const message of ["请输入 SKU", "请输入价格", "请输入库存"]) {
+      expect(await screen.findByText(message)).toBeInTheDocument();
+    }
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("can resubmit after a server error while the marked field is still invalid", async () => {
+    const onSubmit = vi
+      .fn()
+      .mockRejectedValueOnce(new ApiError(409, "SKU_DUPLICATED", "该 SKU 已存在。"))
+      .mockResolvedValue(undefined);
+    const { user } = setup({ onSubmit });
+    await fill(user);
+    await user.click(screen.getByRole("button", { name: "创建" }));
+    expect(await screen.findByText("该 SKU 已存在")).toBeInTheDocument();
+
+    // 只改别的字段，SKU 仍带着服务端错误，也要能再次提交。
+    await user.type(screen.getByRole("textbox", { name: "库存" }), "1");
+    await user.click(screen.getByRole("button", { name: "创建" }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(2));
+  });
+
   it("does not validate the focused field when cancel is pressed", async () => {
     const { onClose, user } = setup();
     // SKU 打开时自动聚焦，点取消会让它失焦。

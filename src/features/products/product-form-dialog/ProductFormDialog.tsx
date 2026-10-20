@@ -17,7 +17,7 @@ import {
   sanitizeStock,
   type ProductFormOutput,
   type ProductFormValues,
-} from "../productForm";
+} from "./productForm";
 import type { NewProduct, Product } from "../types";
 import styles from "./ProductFormDialog.module.css";
 
