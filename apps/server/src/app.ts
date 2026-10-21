@@ -35,6 +35,8 @@ const webDist = fileURLToPath(new URL("../../web/dist", import.meta.url));
 
 export function createApp(options: CreateAppOptions = {}) {
   const app = new Koa();
+  // 部署在 HTTPS 反向代理之后时设为 true，Koa 才会信任 X-Forwarded-Proto，secure cookie 才能下发。
+  app.proxy = process.env.TRUST_PROXY === "true";
 
   app.use(errorHandler);
   app.use(requestId);

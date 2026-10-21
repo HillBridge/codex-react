@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+.git
+.github
+.githooks
+.vscode
+.worktrees
+docs
+tests
+test-results
+playwright-report
+coverage
+**/*.tsbuildinfo
+**/*.test.ts
+**/*.test.tsx
+.DS_Store

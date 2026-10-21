@@ -29,6 +29,24 @@ pnpm dev
 
 生产部署先运行 `pnpm build`，再用 `pnpm start` 启动 Koa。Koa 在同一端口提供 `apps/web/dist/` 静态资源和 `/api`，并将前端深层路由回退到 SPA 入口。`PORT` 环境变量可更改默认的 3001 端口。
 
+## 容器部署
+
+后端用 esbuild 连同 `@merchant/contracts` 和第三方依赖打成单个 `apps/server/dist/server.js`（`pnpm build` 会同时构建前后端），运行时不需要 `node_modules` 和 tsx。Dockerfile 是多阶段构建，最终镜像只含前后端产物。
+
+```sh
+docker build -t merchant-admin .
+docker run -p 3001:3001 -e COOKIE_SECURE=false merchant-admin   # 纯 HTTP 演示
+docker run -p 3001:3001 -e TRUST_PROXY=true merchant-admin      # HTTPS 反向代理之后
+```
+
+| 环境变量        | 作用                                                                          |
+| --------------- | ----------------------------------------------------------------------------- |
+| `PORT`          | 监听端口，默认 3001                                                           |
+| `TRUST_PROXY`   | 设为 `true` 时信任 `X-Forwarded-Proto`，用于 TLS 在反向代理处终止的部署       |
+| `COOKIE_SECURE` | 生产环境会话 cookie 默认带 `secure`；纯 HTTP 部署设为 `false`，否则登录会失败 |
+
+不用 Docker 时：`pnpm build` 后执行 `pnpm start:prod`（运行打包产物），或 `pnpm start`（用 tsx 直接跑源码）。
+
 ## 常用检查
 
 ```sh

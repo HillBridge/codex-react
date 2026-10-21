@@ -11,17 +11,18 @@
     "dev": "pnpm --filter @merchant/web dev",
     "dev:backend": "pnpm --filter @merchant/server dev",
     "start": "pnpm --filter @merchant/server start",
-    "build": "pnpm --filter @merchant/web build",
+    "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r typecheck",
     "check:deprecated": "pnpm -r check:deprecated",
     "lint": "eslint . --max-warnings 0",
     "lint:styles": "stylelint \"apps/web/src/**/*.css\"",
-    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,html}\" \"packages/**/*.{ts,json}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
-    "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json,html}\" \"packages/**/*.{ts,json}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
-    "prepare": "git config core.hooksPath .githooks",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,html}\" \"packages/**/*.{ts,json}\" \"tests/**/*.ts\" \"apps/**/*.mjs\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json,html}\" \"packages/**/*.{ts,json}\" \"tests/**/*.ts\" \"apps/**/*.mjs\" \"scripts/**/*.mjs\" \"*.{ts,js,mjs,json,html}\"",
+    "prepare": "git config core.hooksPath .githooks || true",
     "test": "pnpm -r test",
     "test:e2e": "playwright test",
-    "check": "pnpm format:check && pnpm lint:styles && pnpm typecheck && pnpm check:deprecated && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm lint:styles && pnpm typecheck && pnpm check:deprecated && pnpm lint && pnpm test && pnpm build",
+    "start:prod": "pnpm --filter @merchant/server start:prod"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

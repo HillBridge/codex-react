@@ -22,7 +22,9 @@ export function sessionCookieOptions() {
     httpOnly: true,
     sameSite: "lax" as const,
     signed: false,
-    secure: process.env.NODE_ENV === "production",
+    // 生产环境默认只在 HTTPS 下发 cookie；纯 HTTP 的内网或演示部署可设 COOKIE_SECURE=false。
+    secure:
+      process.env.NODE_ENV === "production" && process.env.COOKIE_SECURE !== "false",
     path: "/",
   };
 }

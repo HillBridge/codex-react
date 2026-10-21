@@ -112,7 +112,7 @@ export default tseslint.config(
   },
   // 构建脚本运行在 Node 里。
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["scripts/**/*.mjs", "apps/**/*.mjs"],
     languageOptions: { globals: { console: "readonly", process: "readonly" } },
   },
   ...fsdBlocks,
