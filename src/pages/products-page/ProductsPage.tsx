@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/session";
 import {
@@ -21,6 +21,8 @@ import { Pagination } from "@/shared/ui/pagination";
 import { StatusPanel } from "@/shared/ui/status-panel";
 import { TableFilter } from "@/shared/ui/table-filter";
 
+const getProductId = (product: Product) => product.id;
+
 export function ProductsPage() {
   const merchant = useSession().data!.merchant;
   const { params, update, setPage, reset } = useUrlParams();
@@ -32,10 +34,12 @@ export function ProductsPage() {
   // 弹出框三种状态：关闭、新建、编辑某个商品。
   const [dialog, setDialog] = useState<{ product?: Product } | null>(null);
   const canCreate = merchant.permissions.includes("product:create");
-  const columns = getProductColumns({
-    canEdit: merchant.permissions.includes("product:update"),
-    onEdit: (product) => setDialog({ product }),
-  });
+  const canEdit = merchant.permissions.includes("product:update");
+  // 引用稳定，弹窗开关引起的页面重渲染不会重绘表格。
+  const columns = useMemo(
+    () => getProductColumns({ canEdit, onEdit: (product) => setDialog({ product }) }),
+    [canEdit],
+  );
 
   const openCreate = () => setDialog({});
 
@@ -91,7 +95,8 @@ export function ProductsPage() {
           ariaLabel="商品列表"
           rows={query.data!.items}
           columns={columns}
-          getRowId={(product) => product.id}
+          getRowId={getProductId}
+          isRefreshing={query.isPlaceholderData}
         />
       ) : (
         <StatusPanel kind="empty" title="没有符合条件的商品" />

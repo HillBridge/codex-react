@@ -1,6 +1,12 @@
 .scroll {
+  transition: opacity 120ms ease;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.scroll[data-refreshing] {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .table {

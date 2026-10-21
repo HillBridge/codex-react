@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/session";
 import type { Order } from "@/entries/order";
@@ -20,6 +20,8 @@ import { TableFilter } from "@/shared/ui/table-filter";
 import { Pagination } from "@/shared/ui/pagination";
 import { StatusPanel } from "@/shared/ui/status-panel";
 
+const getOrderId = (order: Order) => order.id;
+
 export function OrdersPage() {
   const merchant = useSession().data!.merchant;
   const { params, update, setPage, reset } = useUrlParams();
@@ -29,10 +31,12 @@ export function OrdersPage() {
   const deleteMutation = useDeleteOrder();
   const exportMutation = useExportOrders();
   const [deleting, setDeleting] = useState<Order | null>(null);
-  const columns = getOrderColumns({
-    canDelete: merchant.permissions.includes("order:delete"),
-    onDelete: setDeleting,
-  });
+  const canDelete = merchant.permissions.includes("order:delete");
+  // 引用稳定，弹窗开关引起的页面重渲染不会重绘表格。
+  const columns = useMemo(
+    () => getOrderColumns({ canDelete, onDelete: setDeleting }),
+    [canDelete],
+  );
 
   const confirmDelete = () => {
     if (!deleting) return;
@@ -86,7 +90,8 @@ export function OrdersPage() {
           ariaLabel="订单列表"
           rows={query.data!.items}
           columns={columns}
-          getRowId={(order) => order.id}
+          getRowId={getOrderId}
+          isRefreshing={query.isPlaceholderData}
         />
       ) : (
         <StatusPanel kind="empty" title="没有符合条件的订单" />

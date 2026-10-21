@@ -20,7 +20,6 @@ import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
   const session = useSession();
-  const merchant = session.data!.merchant;
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const logoutMutation = useMutation({
@@ -66,6 +65,10 @@ export function AppLayout() {
       退出登录
     </Button>
   );
+
+  // 退出登录时会话缓存先被清空、随后才跳转到登录页，这一小段时间里没有会话数据，不渲染而不是报错。
+  const merchant = session.data?.merchant;
+  if (!merchant) return null;
 
   return (
     <div className={styles.shell}>

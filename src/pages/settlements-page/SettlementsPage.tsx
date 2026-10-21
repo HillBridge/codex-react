@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "@/features/session";
 import {
   getSettlementColumns,
@@ -15,13 +15,16 @@ import { Pagination } from "@/shared/ui/pagination";
 import { StatusPanel } from "@/shared/ui/status-panel";
 import { TableFilter } from "@/shared/ui/table-filter";
 
+const getSettlementId = (settlement: Settlement) => settlement.id;
+
 export function SettlementsPage() {
   const merchant = useSession().data!.merchant;
   const { params, update, setPage, reset } = useUrlParams();
   const filters = parseSettlementFilters(params);
   const query = useSettlements(merchant.id, filters);
   const [viewing, setViewing] = useState<Settlement | null>(null);
-  const columns = getSettlementColumns({ onViewOrders: setViewing });
+  // 引用稳定，弹窗开关引起的页面重渲染不会重绘表格。
+  const columns = useMemo(() => getSettlementColumns({ onViewOrders: setViewing }), []);
 
   return (
     <>
@@ -46,7 +49,8 @@ export function SettlementsPage() {
           ariaLabel="结算单列表"
           rows={query.data!.items}
           columns={columns}
-          getRowId={(settlement) => settlement.id}
+          getRowId={getSettlementId}
+          isRefreshing={query.isPlaceholderData}
         />
       ) : (
         <StatusPanel kind="empty" title="没有符合条件的结算单" />
