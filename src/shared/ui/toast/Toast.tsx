@@ -1,7 +1,17 @@
 import { Toaster, toast } from "sonner";
+import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 
 export function ToastViewport() {
-  return <Toaster closeButton position="top-right" richColors />;
+  // 手机上顶部是固定导航，提示放到底部，避免遮挡。
+  const isMobile = useIsMobile();
+  return (
+    <Toaster
+      closeButton
+      mobileOffset={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+      position={isMobile ? "bottom-center" : "top-right"}
+      richColors
+    />
+  );
 }
 
 export function notifyError({

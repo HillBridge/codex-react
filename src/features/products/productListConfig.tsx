@@ -28,6 +28,7 @@ export const getProductColumns = ({
         {
           key: "actions",
           header: "操作",
+          isActions: true,
           cell: (product: Product) => (
             <TableActions>
               <Button

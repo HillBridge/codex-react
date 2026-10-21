@@ -85,3 +85,16 @@
 .radio[data-focus-visible]::before {
   box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
+
+@media (max-width: 48rem) {
+  /* 避免 iOS 在聚焦小于 16px 的输入框时自动放大页面。 */
+  .field input[type="text"],
+  .field input[type="password"],
+  .field input:not([type]) {
+    font-size: 16px;
+  }
+
+  .radios {
+    flex-wrap: wrap;
+  }
+}

@@ -35,3 +35,10 @@
 .marker[data-kind="forbidden"] {
   background: var(--color-danger);
 }
+
+@media (max-width: 48rem) {
+  .panel {
+    min-height: 12rem;
+    padding: var(--space-6) var(--space-4);
+  }
+}

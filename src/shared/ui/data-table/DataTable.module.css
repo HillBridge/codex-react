@@ -1,3 +1,8 @@
+.scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table {
   width: 100%;
   border-spacing: 0;
@@ -12,6 +17,10 @@
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--color-border);
   text-align: left;
+}
+
+.table td {
+  overflow-wrap: anywhere;
 }
 
 .table th {
@@ -44,4 +53,85 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+
+@media (max-width: 48rem) {
+  .scroll {
+    overflow: visible;
+  }
+
+  .table,
+  .table tbody {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .table {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  /* 卡片里不需要表头，但保留给读屏软件。 */
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table tr {
+    display: grid;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .table td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 0;
+    text-align: right;
+  }
+
+  .table td::before {
+    flex: none;
+    content: attr(data-label);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    text-align: left;
+  }
+
+  /* 行标题（订单号、SKU 等）作为卡片标题。 */
+  .table td[role="rowheader"] {
+    padding-top: var(--space-3);
+    background: var(--color-surface-muted);
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 600;
+  }
+
+  .table td[data-actions] {
+    justify-content: flex-end;
+    padding-bottom: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .table td[data-actions]::before {
+    display: none;
+  }
+
+  /* 卡片整行悬停高亮由 tr 承担，单元格保持透明。 */
+  .table tr[data-hovered] {
+    background: var(--color-primary-subtle);
+  }
+
+  .table tr[data-hovered] td {
+    background: transparent;
+  }
 }

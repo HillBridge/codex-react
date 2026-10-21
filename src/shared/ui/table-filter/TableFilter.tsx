@@ -10,7 +10,9 @@ import {
   SelectValue,
   TextField,
 } from "react-aria-components";
+import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 import { Button } from "@/shared/ui/button";
+import { MobileSelect } from "./MobileSelect";
 import styles from "./TableFilter.module.css";
 
 export type TableFilterField =
@@ -51,6 +53,15 @@ export function TableFilter({
     Object.fromEntries(searchFields.map((field) => [field.key, values[field.key] ?? ""]));
   const [drafts, setDrafts] = useState(initialDrafts);
   const submit = () => onChange(drafts);
+  const isMobile = useIsMobile();
+  // 窄屏：有搜索框时，下拉筛选默认折叠，由“筛选”按钮展开；没有搜索框则不折叠。
+  const [expanded, setExpanded] = useState(false);
+  const selectFields = fields.filter((field) => field.type === "select");
+  const collapsible = searchFields.length > 0 && selectFields.length > 0;
+  const collapsed = collapsible && !expanded;
+  const activeCount = selectFields.filter(
+    (field) => values[field.key] && values[field.key] !== "all",
+  ).length;
 
   return (
     <div className={styles.filters}>
@@ -71,11 +82,25 @@ export function TableFilter({
               }}
             />
           </TextField>
+        ) : isMobile ? (
+          <MobileSelect
+            key={field.key}
+            label={field.label}
+            ariaLabel={field.ariaLabel}
+            options={field.options}
+            value={values[field.key]}
+            onChange={(key) => onChange({ [field.key]: key })}
+            className={[styles.selectField, collapsed && styles.collapsed]
+              .filter(Boolean)
+              .join(" ")}
+          />
         ) : (
           <Select
             key={field.key}
             aria-label={field.ariaLabel ?? field.label}
-            className={styles.selectField}
+            className={[styles.selectField, collapsed && styles.collapsed]
+              .filter(Boolean)
+              .join(" ")}
             selectedKey={values[field.key]}
             onSelectionChange={(key) => onChange({ [field.key]: String(key) })}
           >
@@ -96,6 +121,15 @@ export function TableFilter({
         ),
       )}
       <div className={styles.actions}>
+        {collapsible ? (
+          <Button
+            aria-expanded={expanded}
+            className={styles.toggle}
+            onPress={() => setExpanded((prev) => !prev)}
+          >
+            {activeCount > 0 ? `筛选 (${activeCount})` : "筛选"}
+          </Button>
+        ) : null}
         <Button onPress={submit}>查询</Button>
         <Button
           onPress={() => {

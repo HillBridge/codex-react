@@ -41,3 +41,13 @@
   gap: var(--space-3);
   margin-top: var(--space-6);
 }
+
+@media (max-width: 48rem) {
+  .page {
+    padding: var(--space-4);
+  }
+
+  .card {
+    padding: var(--space-6) var(--space-4);
+  }
+}

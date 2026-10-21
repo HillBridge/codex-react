@@ -23,6 +23,8 @@ export default {
       },
     ],
     "media-feature-range-notation": "prefix",
+    // 断点只用两个：48rem（手机）、64rem（平板/小屏笔记本）。新增断点先改这里并同步文档。
+    "media-feature-name-value-allowed-list": { "max-width": ["48rem", "64rem"] },
     "selector-class-pattern": "^[a-z][a-zA-Z0-9]*$",
     "selector-max-specificity": "0,3,0",
     "value-keyword-case": ["lower", { camelCaseSvgKeywords: true }],

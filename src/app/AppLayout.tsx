@@ -1,10 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  Button as AriaButton,
+  Dialog,
+  DialogTrigger,
+  Modal,
+  ModalOverlay,
+  Popover,
+} from "react-aria-components";
 import { Link, NavLink, Outlet } from "react-router";
 import { useNavigate } from "react-router";
 import { logout, resetQueryCache, useSession } from "@/features/session";
+import { useIsMobile } from "@/shared/hooks/useMediaQuery";
 import { Button } from "@/shared/ui/button";
 import { StatusPanel } from "@/shared/ui/status-panel";
 import { notifySuccess } from "@/shared/ui/toast";
+import { MenuIcon, UserIcon } from "./icons";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
@@ -21,43 +32,104 @@ export function AppLayout() {
     },
   });
 
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigation = (
+    <nav aria-label="业务导航" className={styles.nav}>
+      {/* NavLink 在当前路径匹配时自动设置 aria-current="page"，样式据此高亮。 */}
+      {[
+        { to: "/workspace", label: "概览", end: true },
+        { to: "/workspace/orders", label: "订单管理" },
+        { to: "/workspace/products", label: "商品管理" },
+        { to: "/workspace/settlements", label: "结算管理" },
+      ].map((item) => (
+        <NavLink
+          className={styles.navItem}
+          end={item.end}
+          key={item.to}
+          onClick={() => setMenuOpen(false)}
+          to={item.to}
+        >
+          {item.label}
+        </NavLink>
+      ))}
+    </nav>
+  );
+
+  const logoutButton = (
+    <Button
+      isDisabled={logoutMutation.isPending}
+      onPress={() => logoutMutation.mutate()}
+      variant="secondary"
+    >
+      退出登录
+    </Button>
+  );
+
   return (
     <div className={styles.shell}>
       <aside aria-label="主导航" className={styles.sidebar}>
-        <Link aria-label="商户工作台首页" className={styles.brand} to="/">
-          商户工作台
-        </Link>
-        <nav aria-label="业务导航">
-          {/* NavLink 在当前路径匹配时自动设置 aria-current="page"，样式据此高亮。 */}
-          <NavLink className={styles.navItem} to="/workspace" end>
-            概览
-          </NavLink>
-          <NavLink className={styles.navItem} to="/workspace/orders">
-            订单管理
-          </NavLink>
-          <NavLink className={styles.navItem} to="/workspace/products">
-            商品管理
-          </NavLink>
-          <NavLink className={styles.navItem} to="/workspace/settlements">
-            结算管理
-          </NavLink>
-        </nav>
-        <span className={styles.environment}>开发环境</span>
+        {isMobile ? (
+          <>
+            <AriaButton
+              aria-label="打开导航菜单"
+              className={styles.menuButton}
+              onPress={() => setMenuOpen(true)}
+            >
+              <MenuIcon />
+            </AriaButton>
+            {/* 账号信息收进右侧图标，点击后弹出姓名和退出登录。 */}
+            <DialogTrigger>
+              <AriaButton
+                aria-label="账号菜单"
+                className={`${styles.menuButton} ${styles.userButton}`}
+              >
+                <UserIcon />
+              </AriaButton>
+              <Popover className={styles.userPopover} placement="bottom end">
+                <Dialog aria-label="账号信息" className={styles.userDialog}>
+                  <span>{session.data?.user.name}</span>
+                  {logoutButton}
+                </Dialog>
+              </Popover>
+            </DialogTrigger>
+            {/* 手机上菜单收进左侧抽屉，选择页面后自动关闭。 */}
+            <ModalOverlay
+              className={styles.drawerOverlay}
+              isDismissable
+              isOpen={menuOpen}
+              onOpenChange={setMenuOpen}
+            >
+              <Modal className={styles.drawer}>
+                <Dialog aria-label="导航菜单" className={styles.drawerDialog}>
+                  <span className={styles.brand}>商户工作台</span>
+                  {navigation}
+                  <span className={styles.environment}>开发环境</span>
+                </Dialog>
+              </Modal>
+            </ModalOverlay>
+          </>
+        ) : (
+          <>
+            <Link aria-label="商户工作台首页" className={styles.brand} to="/">
+              商户工作台
+            </Link>
+            {navigation}
+            <span className={styles.environment}>开发环境</span>
+          </>
+        )}
       </aside>
       <div className={styles.mainColumn}>
-        <header className={styles.topbar}>
-          <span>商户管理控制台</span>
-          <div className={styles.accountArea}>
-            <span>{session.data?.user.name}</span>
-            <Button
-              isDisabled={logoutMutation.isPending}
-              onPress={() => logoutMutation.mutate()}
-              variant="secondary"
-            >
-              退出登录
-            </Button>
-          </div>
-        </header>
+        {isMobile ? null : (
+          <header className={styles.topbar}>
+            <span>商户管理控制台</span>
+            <div className={styles.accountArea}>
+              <span>{session.data?.user.name}</span>
+              {logoutButton}
+            </div>
+          </header>
+        )}
         <main className={styles.content}>
           <h1>{merchant.name}</h1>
           <Outlet />

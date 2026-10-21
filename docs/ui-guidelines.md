@@ -38,6 +38,15 @@ src/app/styles/global.css         全局 reset、字体和页面默认样式
 - 当前只维护默认浅色主题。新增暗色或品牌主题时使用根节点主题属性和 CSS 变量，不在组件文件复制第二套样式。
 - 商户品牌配置只影响外观；必须校验配置值，不能用于实现权限判断或数据隔离。
 
+## 响应式与 H5
+
+- 断点只有两个：`64rem`（平板/小屏笔记本，侧栏收窄）和 `48rem`（手机）。写法统一为 `@media (max-width: 48rem)`，由 stylelint 的 `media-feature-name-value-allowed-list` 限制，新增断点需先改 `stylelint.config.mjs` 并更新本节。
+- 纯样式差异直接写 `@media`；只有需要渲染不同组件或传不同 props 时才用 `useIsMobile()`（`shared/hooks/useMediaQuery`），其断点与 `48rem` 保持一致。
+- 手机上列表以卡片展示：`DataTable` 的列用 `isActions` 标记操作列，其余列自动带上列名；筛选栏有搜索框时下拉默认折叠。
+- 手机上弹窗（`Dialog`）和下拉选项（`TableFilter`）从底部滑出。表单操作按钮在手机上固定在弹窗底部。
+- 页面内容避开刘海和底部横条：`body` 已按 `env(safe-area-inset-*)` 留白，自己定位到屏幕边缘的元素（如底部抽屉）需自行加上。
+- 输入框在手机上字号不小于 16px，避免 iOS 聚焦时自动放大页面。
+
 ## 交互、可访问性与内容
 
 - 可交互控件必须有清晰的键盘焦点样式；完整支持键盘操作，不移除 React Aria 提供的可访问行为。

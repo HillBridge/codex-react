@@ -42,3 +42,12 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
 }
+
+/* 窄屏（H5）：控件加高到触控友好的尺寸，各组件通过变量自动生效。 */
+@media (max-width: 48rem) {
+  :root {
+    --control-height-sm: 2.25rem;
+    --control-height: 2.5rem;
+    --control-height-lg: 2.75rem;
+  }
+}

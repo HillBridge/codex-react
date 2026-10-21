@@ -14,3 +14,22 @@
   justify-content: flex-end;
   gap: var(--space-3);
 }
+
+@media (max-width: 48rem) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  /* 表单较长时，操作按钮固定在弹窗底部，不必滚到底才能提交。 */
+  .actions {
+    position: sticky;
+    bottom: 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .actions > * {
+    flex: 1;
+  }
+}

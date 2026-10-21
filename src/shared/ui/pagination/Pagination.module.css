@@ -6,3 +6,21 @@
   padding-top: var(--space-4);
   color: var(--color-text-muted);
 }
+
+@media (max-width: 48rem) {
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  /* 页码信息独占一行置顶，上一页/下一页并排在下方。 */
+  .pagination span {
+    flex: 1 0 100%;
+    order: -1;
+    text-align: center;
+  }
+
+  .pagination > button {
+    flex: 1;
+  }
+}

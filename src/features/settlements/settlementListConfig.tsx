@@ -42,6 +42,7 @@ export const getSettlementColumns = ({
   {
     key: "actions",
     header: "操作",
+    isActions: true,
     cell: (settlement) => (
       <TableActions>
         <Button

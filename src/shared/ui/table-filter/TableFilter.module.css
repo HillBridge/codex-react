@@ -115,3 +115,93 @@
   color: var(--color-primary);
   font-weight: 600;
 }
+
+.toggle {
+  display: none;
+}
+
+.mobileLabel {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: end stretch;
+  background: var(--color-overlay);
+}
+
+.sheet {
+  max-height: 70dvh;
+  overflow: auto;
+  padding: var(--space-2);
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+}
+
+.sheetDialog {
+  outline: 0;
+}
+
+.sheet[data-entering] {
+  animation: sheet-in 200ms ease-out;
+}
+
+.sheet[data-exiting] {
+  animation: sheet-in 150ms ease-in reverse;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet[data-entering],
+  .sheet[data-exiting] {
+    animation: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+    padding: var(--space-3);
+  }
+
+  .search input,
+  .select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* 避免 iOS 在聚焦小于 16px 的输入框时自动放大页面。 */
+  .search input {
+    font-size: 16px;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .toggle {
+    display: inline-flex;
+  }
+
+  /* 底部抽屉里的选项加高，便于手指点击。 */
+  .option {
+    padding: var(--space-3);
+  }
+
+  /* 有搜索框时，下拉筛选默认折叠，点“筛选”展开。 */
+  .collapsed {
+    display: none;
+  }
+}

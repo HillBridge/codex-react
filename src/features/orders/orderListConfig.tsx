@@ -33,6 +33,7 @@ export const getOrderColumns = ({
   {
     key: "actions",
     header: "操作",
+    isActions: true,
     cell: (order) => (
       <TableActions>
         <Link to={order.id}>查看详情</Link>

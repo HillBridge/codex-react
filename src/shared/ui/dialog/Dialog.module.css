@@ -62,3 +62,43 @@
   font-size: 18px;
   font-weight: 600;
 }
+
+/* 手机上弹窗从底部滑出，占满宽度；内容过长时在弹窗内滚动。 */
+@media (max-width: 48rem) {
+  .overlay {
+    place-items: end stretch;
+  }
+
+  .modal,
+  .wide {
+    width: 100%;
+    max-height: 90dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+  }
+
+  .modal[data-entering] {
+    animation: sheet-in 200ms ease-out;
+  }
+
+  .modal[data-exiting] {
+    animation: sheet-in 150ms ease-in reverse;
+  }
+
+  .dialog {
+    padding: var(--space-4);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal[data-entering],
+  .modal[data-exiting] {
+    animation: none;
+  }
+}

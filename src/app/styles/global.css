@@ -14,6 +14,7 @@
   font-synthesis: none;
   line-height: 1.5715;
   text-rendering: optimizeLegibility;
+  text-size-adjust: 100%;
 }
 
 *,
@@ -26,4 +27,9 @@ body {
   margin: 0;
   min-width: 20rem;
   min-height: 100vh;
+  min-height: 100dvh;
+
+  /* viewport-fit=cover 下，刘海、圆角和底部横条区域不放内容。 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
