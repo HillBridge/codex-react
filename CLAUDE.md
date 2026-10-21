@@ -5,16 +5,32 @@
 `merchant-admin-foundation`：商户后台（订单、商品、结算、概览），前后端同仓库，TypeScript + pnpm，Node >= 22.12。
 
 ```
-浏览器 ──(Vite dev proxy /api)──▶ Koa 后端（内存数据）
-  │
-  └─ React SPA：FSD 分层
+浏览器 ──(Vite dev proxy /api)──▶ apps/server（Koa，内存数据）
+  │                                      │
+  └─ apps/web（React SPA，FSD 分层）      │
+             └────── 都依赖 ──▶ packages/contracts（zod 契约）
 ```
 
-- 前端：`src/`，按下文 FSD 分层。
-- 后端：`backend/src/`，Koa 分层：`routes`（auth、orders、products、settlements、overview）、`auth`（session、require-user 中间件）、`lib`（request-id、pagination、errors）、`data`（demo-data + 内存 store）。用 `koa-static` 托管构建产物。数据在内存中，重启即重置，适合演示和 e2e，不是生产持久化方案。
-- 契约：`contracts/` 放前后端共用的 zod 校验规则（目前有 `product.ts`、`auth.ts`），是规则的唯一来源。前端用别名 `@contracts/*` 引入，后端用相对路径。
-- 测试：前端和后端测试共用一套 Vitest 配置（含 `contracts/`）；e2e 在 `tests/e2e`。
+pnpm workspace，三个包，依赖只能朝下：`apps/web`、`apps/server` → `packages/contracts`。
+
+| 包                    | 路径                  | 职责                                                                                                                                   |
+| --------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `@merchant/web`       | `apps/web`            | 前端：`src/` 按下文 FSD 分层，自带 Vite、Vitest（jsdom）配置                                                                           |
+| `@merchant/server`    | `apps/server`         | 后端：`src/` 下 `routes`（auth、orders、products、settlements、overview）、`auth`、`lib`、`data`。用 `koa-static` 托管 `apps/web/dist` |
+| `@merchant/contracts` | `packages/contracts`  | 前后端共用的契约，只依赖 `zod`。schema 是校验规则和响应类型的唯一来源                                                                  |
+
+- 契约包内容：`auth`（登录、会话）、`order`、`settlement`、`overview`、`product`、`common`（分页）。通过 `@merchant/contracts` 引入，包入口直接指向源码，无构建步骤；不要引用包内部路径。
+- 数据在内存中，重启即重置，适合演示和 e2e，不是生产持久化方案。
+- 测试：各包用自己的 Vitest 配置（web 为 jsdom，server 和 contracts 为 node），根目录 `pnpm test` 递归执行；e2e 在根目录 `tests/e2e`。
 - 设计文档：`docs/`（路由、UI 规范、各次演进的 spec 与 plan）。
+
+### Monorepo 约定
+
+- **新增接口或改字段，先改 `packages/contracts`**：用 zod 定义 schema，类型用 `z.infer` 推导。前端 `types.ts` 和后端 `data` 里的实体类型从契约转出，不再各写一份。
+- **应用之间互不依赖**：`web` 不能引用 `server`，`server` 不能引用 `web`，`contracts` 不能引用任何应用（ESLint 强制）。需要共享就放进 `packages/*`。
+- **契约测试**：`apps/server/src/routes/contract.test.ts` 验证真实接口响应满足契约 schema；新增接口时在这里补一条。
+- **依赖归属**：运行时和测试依赖写在使用它的包里；根 `package.json` 只放跨包工具（eslint、prettier、stylelint、typescript、playwright）。内部包用 `"@merchant/contracts": "workspace:*"`。
+- **常用命令**：`pnpm dev`（前端）、`pnpm dev:backend`（后端）、`pnpm --filter @merchant/web <script>` 只跑某个包。
 
 ## 技术栈
 
@@ -27,7 +43,7 @@
 | react-aria-components                         | 无样式可访问组件基础（Dialog、表格交互等），保证键盘与屏幕阅读器支持                                    |
 | sonner                                        | Toast 提示                                                                                              |
 | CSS Modules + `tokens.css`                    | 样式隔离、设计令牌统一；stylelint-declaration-strict-value 强制使用令牌而非硬编码值                     |
-| zod 4                                         | 校验规则的唯一来源：`contracts/` 中的 schema 同时给后端校验请求、给前端表单复用，并推导 TypeScript 类型 |
+| zod 4                                         | 校验规则的唯一来源：`packages/contracts` 中的 schema 同时给后端校验请求、给前端表单复用，并推导 TypeScript 类型 |
 | react-hook-form + @hookform/resolvers         | 表单状态（touched、错误、提交中）的标准实现，通过 zodResolver 接入 zod                                  |
 | Vite 8                                        | 开发服务器、打包、`/api` 代理（e2e 通过 `API_PROXY_TARGET` 切换代理目标）                               |
 | Koa 3 + @koa/router + bodyparser + static     | 轻量后端，提供 API 并托管前端产物                                                                       |
@@ -62,7 +78,7 @@
 - 两个 feature 共用的类型或展示规则下沉到 `entries`；只有一个 feature 用就留在该 feature。
 - 两个页面共用一块带数据的界面，提到 `widgets`（feature 之间不能互相引用，只有 widgets 能同时引用多个 feature）。
 
-规则（已由 `eslint.config.js` 强制，违反则 `pnpm lint` 失败）：
+规则（已由 `eslint.config.js`，FSD 规则只作用于 `apps/web/src` 强制，违反则 `pnpm lint` 失败）：
 
 - 下层不能引用上层，例如 `shared` 不能引用 `features`。
 - 同一层的切片互不依赖，例如 `features/orders` 不能引用 `features/session`。需要共享时下沉到更低的层。
@@ -85,7 +101,7 @@
 - 每个方法上方用一行注释说明用途（精确查询 / 批量失效等）。
 - 只有单个键的模块，直接导出一个常量即可。
 
-参考实现：`src/features/orders/queryKeys.ts`。
+参考实现：`apps/web/src/features/orders/queryKeys.ts`。
 
 ## 提交前验证
 
@@ -97,11 +113,11 @@
 
 所有表单统一用 react-hook-form + zod，不要手写 touched、错误状态或校验函数。
 
-- **规则只写一份**：接口字段的校验规则写在 `contracts/` 的 zod schema 里。后端用它校验请求，前端表单 schema 复用其中的字段，只在上面加输入形态的转换（如价格元转分、字符串转数字）。不要在前后端各写一遍规则。
+- **规则只写一份**：接口字段的校验规则写在 `packages/contracts` 的 zod schema 里。后端用它校验请求，前端表单 schema 复用其中的字段，只在上面加输入形态的转换（如价格元转分、字符串转数字）。不要在前后端各写一遍规则。
 - **表单状态**：`useForm({ resolver: zodResolver(schema), mode: "onTouched" })`，字段失焦后开始校验，之后实时更新。
 - **字段组件**：用 `@/shared/ui/form-field` 的 `FormTextField`、`FormRadioGroup`，它们绑定 `control` 并展示错误；新的字段类型也加在这里。
 - **输入过滤**：只可能非法的字符通过 `sanitize` 在输入时过滤，校验规则仍以 schema 为准。
 - **放弃填写不校验**：表单用 `useAbandonGuard`，点遮罩、标题或带 `data-abandon` 的“取消”按钮引起的失焦不触发校验。
 - **react-aria 的 `Form` 必须设 `validationBehavior="aria"`**，否则字段无效时浏览器原生校验会拦住提交。
 - **服务端错误**：提交函数返回 Promise，失败时 reject；表单内用 `setError` 就地展示（如 SKU 重复标在字段上，通用校验错误用 Alert），其余失败由调用方 toast。
-- 参考实现：`src/features/products/product-form-dialog/ProductFormDialog.tsx`。
+- 参考实现：`apps/web/src/features/products/product-form-dialog/ProductFormDialog.tsx`。

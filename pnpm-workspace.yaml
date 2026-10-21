@@ -1,2 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+
 allowBuilds:
   esbuild: true
+
+# 第三方包的类型声明常引用 @types/*（如 @koa/router 引用 @types/koa）却没声明依赖，
+# 严格的依赖隔离下会解析失败，类型退化为 any。把 @types/* 提升到根 node_modules 保证可解析。
+publicHoistPattern:
+  - "@types/*"
+  - "*eslint*"
+  - "*prettier*"

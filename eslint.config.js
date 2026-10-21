@@ -3,14 +3,17 @@ import eslint from "@eslint/js";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
+// 前端应用的根目录；FSD 规则只作用于这里。
+const web = "apps/web/src";
+
 // Feature-Sliced Design：层级自上而下依赖，同层切片互不依赖，跨切片只能走公共出口（index.ts）。
 const layers = ["app", "pages", "widgets", "features", "entries", "shared"];
 const sliceLayers = ["pages", "widgets", "features", "entries"];
 
 const slicesOf = (layer) =>
-  fs.existsSync(`src/${layer}`)
+  fs.existsSync(`${web}/${layer}`)
     ? fs
-        .readdirSync(`src/${layer}`, { withFileTypes: true })
+        .readdirSync(`${web}/${layer}`, { withFileTypes: true })
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name)
     : [];
@@ -38,24 +41,37 @@ const layerExtras = {
   ],
 };
 
+// Monorepo 边界：用包名或相对路径跨过应用目录都算违规。
+const webOnly = ["**/web/**", "@merchant/web", "@merchant/web/**"];
+const serverOnly = ["**/server/**", "@merchant/server", "@merchant/server/**"];
+const crossApp = restrict(
+  serverOnly,
+  "Monorepo：web 不能依赖 server，共享的契约请放到 packages/contracts。",
+);
+
+const boundaryBlock = (files, patterns) => ({
+  files,
+  rules: { "no-restricted-imports": ["error", { patterns }] },
+});
+
 const fsdBlock = (files, patterns) => ({
   files,
   rules: {
     "no-restricted-imports": [
       "error",
       // 没有可限制的目标时（如某层只有一个切片）跳过，空 group 会让 ESLint 报配置错误。
-      { patterns: patterns.filter((pattern) => pattern.group.length > 0) },
+      { patterns: [...patterns, crossApp].filter((pattern) => pattern.group.length > 0) },
     ],
   },
 });
 
 const fsdBlocks = [
-  fsdBlock(["src/**/*.{ts,tsx}"], [deepImport]),
+  fsdBlock([`${web}/**/*.{ts,tsx}`], [deepImport]),
   ...layers
     .filter((layer) => layer !== "app")
     .map((layer) =>
       fsdBlock(
-        [`src/${layer}/**/*.{ts,tsx}`],
+        [`${web}/${layer}/**/*.{ts,tsx}`],
         [
           restrict(upperLayers(layer), "FSD：下层不能依赖上层。"),
           deepImport,
@@ -66,7 +82,7 @@ const fsdBlocks = [
   ...sliceLayers.flatMap((layer) =>
     slicesOf(layer).map((slice) =>
       fsdBlock(
-        [`src/${layer}/${slice}/**/*.{ts,tsx}`],
+        [`${web}/${layer}/${slice}/**/*.{ts,tsx}`],
         [
           restrict(upperLayers(layer), "FSD：下层不能依赖上层。"),
           restrict(
@@ -85,12 +101,12 @@ const fsdBlocks = [
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ["**/dist/**", "**/node_modules/**", "test-results/**"],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.{ts,tsx}", "vite.config.ts"],
+    files: ["apps/web/src/**/*.{ts,tsx}", "apps/web/vite.config.ts"],
     plugins: { "react-hooks": reactHooks },
     rules: reactHooks.configs.flat.recommended.rules,
   },
@@ -100,6 +116,25 @@ export default tseslint.config(
     languageOptions: { globals: { console: "readonly", process: "readonly" } },
   },
   ...fsdBlocks,
+  // Monorepo 边界：应用之间互不依赖，契约包不依赖任何应用。共享内容只能放进 packages/*，并通过包名引用其公共出口。
+  boundaryBlock(
+    ["apps/server/**/*.ts"],
+    [
+      restrict(
+        webOnly,
+        "Monorepo：server 不能依赖 web，共享的契约请放到 packages/contracts。",
+      ),
+    ],
+  ),
+  boundaryBlock(
+    ["packages/contracts/**/*.ts"],
+    [
+      restrict(
+        [...webOnly, ...serverOnly],
+        "Monorepo：contracts 不能依赖任何应用，只能依赖 zod。",
+      ),
+    ],
+  ),
   // 集成测试需要把真实路由与业务切片组装在一起，允许跨层，但仍禁止深层引用。
-  fsdBlock(["src/**/*.integration.test.{ts,tsx}"], [deepImport]),
+  fsdBlock([`${web}/**/*.integration.test.{ts,tsx}`], [deepImport]),
 );

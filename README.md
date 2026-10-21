@@ -27,7 +27,7 @@ pnpm dev
 
 登录账号为 `admin` / `admin123`（管理员）和 `viewer` / `viewer123`（只读）。演示用户、会话与订单保存在后端进程内存中；重启后端会恢复初始数据。演示凭据不应用于生产环境。
 
-生产部署先运行 `pnpm build`，再用 `pnpm start` 启动 Koa。Koa 在同一端口提供 `dist/` 静态资源和 `/api`，并将前端深层路由回退到 SPA 入口。`PORT` 环境变量可更改默认的 3001 端口。
+生产部署先运行 `pnpm build`，再用 `pnpm start` 启动 Koa。Koa 在同一端口提供 `apps/web/dist/` 静态资源和 `/api`，并将前端深层路由回退到 SPA 入口。`PORT` 环境变量可更改默认的 3001 端口。
 
 ## 常用检查
 
@@ -41,12 +41,16 @@ Playwright 会自动启动 Koa 和 Vite。首次使用需要安装 Chromium：`p
 
 ## 目录边界
 
-- `src/app`: Provider、路由、布局与全局 QueryClient。
-- `src/pages`: 路由页面，只组合 feature 与共享 UI。
-- `src/features`: 按业务域组织 API、Query、组件与类型；跨 feature 只走公开 `index.ts`。
-- `src/shared/api`: 统一请求、凭据策略与错误模型。
-- `src/shared/ui`: 可替换的设计令牌与 React Aria 包装组件。
-- `backend/src`: Koa API、内存演示数据、会话认证和权限校验。
+pnpm workspace，依赖只能朝下：`apps/web`、`apps/server` → `packages/contracts`，应用之间互不依赖（ESLint 强制）。
+
+- `packages/contracts`（`@merchant/contracts`）: 前后端共用的 zod 契约。校验规则、请求与响应类型的唯一来源。
+- `apps/web`（`@merchant/web`）: React SPA，`src` 按 FSD 分层。
+  - `src/app`: Provider、路由、布局与全局 QueryClient。
+  - `src/pages`: 路由页面，只组合 feature 与共享 UI。
+  - `src/features`: 按业务域组织 API、Query、组件与类型；跨 feature 只走公开 `index.ts`。
+  - `src/shared/api`: 统一请求、凭据策略与错误模型。
+  - `src/shared/ui`: 可替换的设计令牌与 React Aria 包装组件。
+- `apps/server`（`@merchant/server`）: Koa API、内存演示数据、会话认证和权限校验。
 - `tests/e2e`: 登录、订单筛选、详情和状态变更浏览器流程。
 
 ## UI 开发

@@ -5,12 +5,12 @@
 ## 样式和组件放置
 
 ```text
-src/shared/ui/<component>/       跨业务复用、契约稳定的基础组件
-src/features/<domain>/<component>/  业务域内可独立维护的组件
-src/features/<domain>/            API、query、mutation、types、领域测试
-src/pages                         路由级页面组合和页面专属样式
-src/shared/ui/tokens.css          全局设计变量
-src/app/styles/global.css         全局 reset、字体和页面默认样式
+apps/web/src/shared/ui/<component>/       跨业务复用、契约稳定的基础组件
+apps/web/src/features/<domain>/<component>/  业务域内可独立维护的组件
+apps/web/src/features/<domain>/            API、query、mutation、types、领域测试
+apps/web/src/pages                         路由级页面组合和页面专属样式
+apps/web/src/shared/ui/tokens.css          全局设计变量
+apps/web/src/app/styles/global.css         全局 reset、字体和页面默认样式
 ```
 
 依赖从基础到页面：tokens / global styles → shared UI → feature UI → pages。页面可以组合下层组件；shared UI 不依赖 feature 或 page。
@@ -24,8 +24,8 @@ src/app/styles/global.css         全局 reset、字体和页面默认样式
 
 ## 全局样式与 CSS Modules
 
-- `tokens.css` 只保存 `:root` 下的自定义属性；新增全局字体、reset 或 `html`/`body` 规则时放入 `src/app/styles/global.css`。
-- 两个全局样式表只在 `src/main.tsx` 引入一次。不要在布局组件、路由页面或 feature 中引入全局 CSS。
+- `tokens.css` 只保存 `:root` 下的自定义属性；新增全局字体、reset 或 `html`/`body` 规则时放入 `apps/web/src/app/styles/global.css`。
+- 两个全局样式表只在 `apps/web/src/main.tsx` 引入一次。不要在布局组件、路由页面或 feature 中引入全局 CSS。
 - 组件/feature 外观放在对应 `.module.css`。禁止用全局 `button`、`table` 等选择器批量覆盖组件外观。
 - React Aria 的交互外观使用其状态属性，如 `data-focused`、`data-hovered`、`data-selected`、`data-disabled`；状态规则归属于该组件的 CSS Module。
 - 避免 `:global`、ID 选择器、`!important` 和过高特异性。确实无法避免时，在 PR 说明原因及影响范围。

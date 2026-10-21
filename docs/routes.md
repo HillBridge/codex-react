@@ -1,6 +1,6 @@
-# 路由说明（src/app/routes.tsx）
+# 路由说明（apps/web/src/app/routes.tsx）
 
-[routes.tsx](../src/app/routes.tsx) 做了四件事：定义路由表、登录守卫、根路径分流、会话过期处理。
+[routes.tsx](../apps/web/src/app/routes.tsx) 做了四件事：定义路由表、登录守卫、根路径分流、会话过期处理。
 
 ## 1. 路由表
 

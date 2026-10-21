@@ -1,0 +1,21 @@
+{
+  "name": "@merchant/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "前后端共用的接口契约：zod schema 是校验规则与响应类型的唯一来源。",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit --pretty false",
+    "check:deprecated": "node ../../scripts/check-deprecated.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.3"
+  }
+}
