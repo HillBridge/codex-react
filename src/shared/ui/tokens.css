@@ -2,14 +2,20 @@
   --color-primary: #1677ff;
   --color-primary-hover: #4096ff;
   --color-primary-active: #0958d9;
+
+  /* 用作文字（链接、选中项）的蓝色，在白底和浅蓝底上对比度均 >= 4.5:1；#1677ff 仅 4.1:1，只用于填充和边框。 */
+  --color-primary-text: #0958d9;
   --color-primary-subtle: #e6f4ff;
   --color-on-primary: #fff;
   --color-focus-ring: #91caff;
   --color-danger: #ff4d4f;
+
+  /* 用作文字（错误提示）的红色，白底对比度 5.6:1；#ff4d4f 仅 3.3:1，只用于填充和边框。 */
+  --color-danger-text: #cf1322;
   --color-danger-hover: #ff7875;
   --color-text: #1f1f1f;
   --color-text-muted: #595959;
-  --color-text-subtle: #8c8c8c;
+  --color-text-subtle: #737373;
   --color-text-disabled: rgb(0 0 0 / 25%);
   --color-border: #d9d9d9;
   --color-border-strong: #bfbfbf;

@@ -10,8 +10,17 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "retain-on-failure",
-    ...devices["Desktop Chrome"],
   },
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // H5 在 iOS 上用 WebKit：100vh、安全区、触摸等差异只有 WebKit 能复现，所以手机布局用例额外在它上面跑一遍。
+    // 首次使用需执行 pnpm exec playwright install webkit。
+    {
+      name: "mobile-safari",
+      testMatch: "mobile-layout.spec.ts",
+      use: { ...devices["iPhone 14"] },
+    },
+  ],
   webServer: [
     {
       command: "pnpm dev:backend",

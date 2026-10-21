@@ -7,6 +7,7 @@ import {
   Modal,
   ModalOverlay,
 } from "react-aria-components";
+import { useSwipeDismiss } from "@/shared/hooks/useSwipeDismiss";
 import styles from "./TableFilter.module.css";
 
 interface MobileSelectProps {
@@ -28,6 +29,7 @@ export function MobileSelect({
   className,
 }: MobileSelectProps) {
   const [isOpen, setOpen] = useState(false);
+  const swipeRef = useSwipeDismiss("down", () => setOpen(false));
   const selectedLabel = options.find((option) => option.id === value)?.label ?? "";
 
   return (
@@ -47,7 +49,7 @@ export function MobileSelect({
         isOpen={isOpen}
         onOpenChange={setOpen}
       >
-        <Modal className={styles.sheet}>
+        <Modal className={styles.sheet} ref={swipeRef}>
           <Dialog aria-label={ariaLabel ?? label} className={styles.sheetDialog}>
             <ListBox
               aria-label={ariaLabel ?? label}

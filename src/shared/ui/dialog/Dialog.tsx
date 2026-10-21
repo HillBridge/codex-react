@@ -6,6 +6,8 @@ import {
   Modal,
   ModalOverlay,
 } from "react-aria-components";
+import { useIsMobile } from "@/shared/hooks/useMediaQuery";
+import { useSwipeDismiss } from "@/shared/hooks/useSwipeDismiss";
 import styles from "./Dialog.module.css";
 
 // 内容异步加载时，等待多久后才先打开弹窗显示加载中。
@@ -52,6 +54,10 @@ export function Dialog({
     return () => clearTimeout(timer);
   }, [waiting, loadingDelay]);
 
+  // 手机上弹窗是底部弹层，向下滑动可关闭（与点遮罩一样受 isDismissable 控制）。
+  const isMobile = useIsMobile();
+  const swipeRef = useSwipeDismiss("down", onClose, isMobile && isDismissable);
+
   return (
     <ModalOverlay
       className={styles.overlay}
@@ -62,6 +68,7 @@ export function Dialog({
       }}
     >
       <Modal
+        ref={swipeRef}
         className={[styles.modal, size === "wide" && styles.wide]
           .filter(Boolean)
           .join(" ")}

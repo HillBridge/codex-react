@@ -46,6 +46,9 @@ src/app/styles/global.css         全局 reset、字体和页面默认样式
 - 手机上弹窗（`Dialog`）和下拉选项（`TableFilter`）从底部滑出。表单操作按钮在手机上固定在弹窗底部。
 - 页面内容避开刘海和底部横条：`body` 已按 `env(safe-area-inset-*)` 留白，自己定位到屏幕边缘的元素（如底部抽屉）需自行加上。
 - 输入框在手机上字号不小于 16px，避免 iOS 聚焦时自动放大页面。
+- 抽屉和底部弹层支持滑动关闭：抽屉向左滑、弹层向下滑，用 `useSwipeDismiss`（`shared/hooks`）。新做的手机端弹层应接入它。
+- 文字颜色要满足 WCAG AA（对比度 >= 4.5:1）：蓝色文字用 `--color-primary-text`、红色错误文字用 `--color-danger-text`、次要文字用 `--color-text-subtle`；`--color-primary`、`--color-danger` 只用于填充和边框。
+- 新增 `transition` 或 `animation` 时，在同一文件里加 `@media (prefers-reduced-motion: reduce)` 将其关闭。
 
 ## 交互、可访问性与内容
 

@@ -46,12 +46,11 @@
 }
 
 .table a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-decoration: none;
 }
 
 .table a:hover {
-  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 
@@ -132,6 +131,14 @@
     display: none;
   }
 
+  /* 操作链接和按钮一样高，手指好点。 */
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-height);
+    padding: 0 var(--space-2);
+  }
+
   /* 卡片整行悬停高亮由 tr 承担，单元格保持透明。 */
   .table tr[data-hovered] {
     background: var(--color-primary-subtle);
@@ -139,5 +146,11 @@
 
   .table tr[data-hovered] td {
     background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll {
+    transition: none;
   }
 }

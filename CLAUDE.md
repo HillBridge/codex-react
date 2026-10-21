@@ -91,7 +91,7 @@
 
 提交前钩子（`.githooks/pre-commit`）会依次执行 format:check、lint:styles、typecheck、check:deprecated、lint、test，失败则不能提交。
 
-推送前钩子（`.githooks/pre-push`）会执行 `pnpm test:e2e`（Playwright）。e2e 使用独立端口 3101 的后端并每次新起，不影响开发中的服务；因为较慢，所以不放在提交钩子里。
+推送前钩子（`.githooks/pre-push`）会执行 `pnpm test:e2e`（Playwright）。手机布局用例（`mobile-layout.spec.ts`）会同时在 Chromium 和 iPhone（WebKit）上跑，首次需执行 `pnpm exec playwright install webkit`。e2e 使用独立端口 3101 的后端并每次新起，不影响开发中的服务；因为较慢，所以不放在提交钩子里。
 
 ## 表单约定
 

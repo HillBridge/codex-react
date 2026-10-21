@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Button as AriaButton,
   Dialog,
@@ -12,6 +12,7 @@ import { Link, NavLink, Outlet } from "react-router";
 import { useNavigate } from "react-router";
 import { logout, resetQueryCache, useSession } from "@/features/session";
 import { useIsMobile } from "@/shared/hooks/useMediaQuery";
+import { useSwipeDismiss } from "@/shared/hooks/useSwipeDismiss";
 import { Button } from "@/shared/ui/button";
 import { StatusPanel } from "@/shared/ui/status-panel";
 import { notifySuccess } from "@/shared/ui/toast";
@@ -33,6 +34,8 @@ export function AppLayout() {
 
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const drawerRef = useSwipeDismiss("left", closeMenu);
 
   const navigation = (
     <nav aria-label="业务导航" className={styles.nav}>
@@ -104,9 +107,12 @@ export function AppLayout() {
               isOpen={menuOpen}
               onOpenChange={setMenuOpen}
             >
-              <Modal className={styles.drawer}>
+              <Modal className={styles.drawer} ref={drawerRef}>
                 <Dialog aria-label="导航菜单" className={styles.drawerDialog}>
-                  <span className={styles.brand}>商户工作台</span>
+                  {/* 手机顶部条没有品牌入口，抽屉里的品牌名兼作回首页的入口。 */}
+                  <Link className={styles.brand} onClick={closeMenu} to="/">
+                    商户工作台
+                  </Link>
                   {navigation}
                   <span className={styles.environment}>开发环境</span>
                 </Dialog>
